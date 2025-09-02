@@ -244,6 +244,12 @@ class ChatSessionManager:
     
     def get_session(self, session_id: str) -> Optional[ChatSession]:
         """Get a session by ID"""
+        # Validate session_id as UUID to prevent path traversal
+        try:
+            uuid_obj = uuid.UUID(session_id)
+        except Exception:
+            self.logger.warning(f"Rejected invalid session_id: {session_id}")
+            return None
         # Check active sessions first
         if session_id in self.active_sessions:
             return self.active_sessions[session_id]
@@ -615,9 +621,20 @@ class ChatSessionManager:
     def _load_session(self, session_id: str) -> Optional[ChatSession]:
         """Load a session from disk"""
         try:
+            # Validate session_id as UUID
+            try:
+                uuid_obj = uuid.UUID(session_id)
+            except Exception:
+                self.logger.warning(f"Rejected invalid session_id: {session_id}")
+                return None
             session_file = self.sessions_dir / f"{session_id}.json"
-            if session_file.exists():
-                with open(session_file, 'r') as f:
+            # Normalize and ensure file path is within sessions_dir
+            normalized_file = session_file.resolve()
+            if not str(normalized_file).startswith(str(self.sessions_dir.resolve())):
+                self.logger.warning(f"Attempted path traversal with session_id: {session_id}")
+                return None
+            if normalized_file.exists():
+                with open(normalized_file, 'r') as f:
                     data = json.load(f)
                 return ChatSession.from_dict(data)
         except Exception as e:
