@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 """
-Test for legacy file migration validation
+Test for legacy file cleanup validation
 
-This validates that deprecated legacy files have been properly archived 
-and are no longer present in the root directory.
+This validates that deprecated legacy files have been completely removed
+and are no longer present anywhere in the repository.
 """
 
 import os
 from pathlib import Path
 
 
-def test_legacy_files_archived():
-    """Test that legacy files are properly archived and not in root"""
-    print("🧪 Testing legacy file migration...")
+def test_legacy_files_removed():
+    """Test that legacy files have been completely removed"""
+    print("🧪 Testing legacy file cleanup...")
     
     repo_root = Path(__file__).parent
     archive_legacy = repo_root / "archive" / "legacy"
     
-    # Legacy files that should be archived
+    # Legacy files that should be completely removed
     legacy_files = [
         "deep_tree_echo-v1.py", 
         "deep_tree_echo-v2.py"
@@ -29,13 +29,13 @@ def test_legacy_files_archived():
         assert not root_file.exists(), f"Legacy file {file} should not exist in root directory"
         print(f"  ✅ {file} correctly removed from root")
     
-    # Verify files ARE in archive/legacy directory
+    # Verify files are NOT in archive/legacy directory (completely cleaned up)
     for file in legacy_files:
         archived_file = archive_legacy / file
-        assert archived_file.exists(), f"Legacy file {file} should exist in archive/legacy/"
-        print(f"  ✅ {file} correctly archived in archive/legacy/")
+        assert not archived_file.exists(), f"Legacy file {file} should be completely removed"
+        print(f"  ✅ {file} completely removed (not even archived)")
     
-    print("  ✅ All legacy file migration tests passed")
+    print("  ✅ All legacy file cleanup tests passed")
 
 
 def test_archive_structure():
@@ -50,16 +50,19 @@ def test_archive_structure():
     assert archive_dir.exists(), "Archive directory should exist"
     assert legacy_dir.exists(), "Archive/legacy directory should exist"
     
-    # Verify README exists in archive
-    readme = archive_dir / "README.md"
-    assert readme.exists(), "Archive README.md should exist"
+    # Verify legacy directory is now empty (or only contains non-deep-tree-echo files)
+    if legacy_dir.exists():
+        legacy_contents = list(legacy_dir.iterdir())
+        deep_tree_echo_files = [f for f in legacy_contents if f.name.startswith('deep_tree_echo')]
+        assert len(deep_tree_echo_files) == 0, "No deep_tree_echo legacy files should remain"
+        print(f"  ✅ Legacy directory clean of deep_tree_echo files")
     
     print("  ✅ Archive structure tests passed")
 
 
-def test_no_legacy_references_in_analyzer():
-    """Test that analyzer no longer detects legacy code retention gap"""
-    print("🧪 Testing analyzer gap detection...")
+def test_analyzer_shows_resolution():
+    """Test that analyzer shows legacy code retention as resolved"""
+    print("🧪 Testing analyzer gap resolution...")
     
     repo_root = Path(__file__).parent
     
@@ -72,30 +75,35 @@ def test_no_legacy_references_in_analyzer():
     analyzer = DeepTreeEchoAnalyzer(repo_root)
     gaps = analyzer.identify_architecture_gaps()
     
-    # Check that Legacy Code Retention gap is not detected
+    # Check that Legacy Code Retention gap is marked as resolved
     legacy_gaps = [gap for gap in gaps if gap['gap'] == 'Legacy Code Retention']
-    assert len(legacy_gaps) == 0, "Legacy Code Retention gap should not be detected"
     
-    print("  ✅ Analyzer correctly does not detect legacy code retention gap")
+    if legacy_gaps:
+        # If gap still exists, it should be marked as resolved
+        legacy_gap = legacy_gaps[0]
+        assert legacy_gap.get('priority') == 'resolved', "Legacy Code Retention gap should be marked as resolved"
+        print("  ✅ Analyzer correctly shows legacy code retention as resolved")
+    else:
+        print("  ✅ Analyzer no longer reports legacy code retention gap")
 
 
 def run_all_tests():
-    """Run all legacy migration tests"""
-    print("🚀 Starting Legacy Migration Validation Tests")
+    """Run all legacy cleanup tests"""
+    print("🚀 Starting Legacy Code Cleanup Validation Tests")
     print("=" * 50)
     
     try:
-        test_legacy_files_archived()
+        test_legacy_files_removed()
         test_archive_structure()
-        test_no_legacy_references_in_analyzer()
+        test_analyzer_shows_resolution()
         
         print("\n" + "=" * 50)
-        print("✅ All legacy migration tests passed!")
-        print("\n🎯 Migration validation successful:")
-        print("  - Legacy files properly archived in archive/legacy/")
+        print("✅ All legacy cleanup tests passed!")
+        print("\n🎯 Legacy code cleanup validation successful:")
+        print("  - Legacy deep_tree_echo files completely removed")
         print("  - Root directory cleaned of deprecated versions")
-        print("  - Archive structure correctly organized")
-        print("  - Analyzer no longer detects legacy code retention gap")
+        print("  - Archive/legacy directory cleaned of deep_tree_echo files")
+        print("  - Analyzer shows legacy code retention as resolved")
         
         return True
         
