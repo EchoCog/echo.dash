@@ -1,6 +1,6 @@
 import numpy as np
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Set, Tuple
+from typing import List, Dict, Optional, Set, Tuple, Any
 from enum import Enum
 import logging
 from pathlib import Path
@@ -11,6 +11,7 @@ import time
 
 # Import unified memory system for consistent memory operations
 from unified_echo_memory import MemoryType, MemoryNode
+from memory_adapter import get_memory_adapter, MemoryAdapter
 
 # Import the echoself introspection module
 try:
@@ -101,31 +102,23 @@ class PersonalityTrait:
         self.history.append((datetime.datetime.now(), value, context))
 
 class CognitiveArchitecture:
-    def __init__(self, use_unified_memory: bool = False):
+    def __init__(self, use_unified_memory: bool = True):
         self.logger = logging.getLogger(__name__)
         self.use_unified_memory = use_unified_memory
         self.unified_memory_system = None
         
-        # Initialize memory storage - unified or legacy
+        # Initialize memory storage - unified by default
         if use_unified_memory:
             try:
-                from unified_echo_memory import UnifiedEchoMemory, EchoMemoryConfig
-                from echo_component_base import EchoConfig
-                
-                config = EchoConfig(
-                    component_name="cognitive_architecture_memory",
-                    version="1.0.0"
-                )
-                memory_config = EchoMemoryConfig(
-                    memory_storage_path=str(Path.home() / '.deep_tree_echo' / 'cognitive_memory'),
-                    working_memory_capacity=10
-                )
-                self.unified_memory_system = UnifiedEchoMemory(config, memory_config)
-                self.unified_memory_system.initialize()
-                self.logger.info("Cognitive architecture using unified memory system")
-            except ImportError as e:
-                self.logger.warning(f"Could not initialize unified memory system: {e}, falling back to legacy memory")
+                # Use memory adapter for unified access
+                self.memory_adapter = get_memory_adapter("cognitive_architecture")
+                self.logger.info("Cognitive architecture using unified memory adapter")
+            except Exception as e:
+                self.logger.warning(f"Could not initialize memory adapter: {e}, falling back to legacy memory")
                 self.use_unified_memory = False
+                self.memory_adapter = None
+        else:
+            self.memory_adapter = None
         
         self.memories: Dict[str, Memory] = {}  # Legacy memory storage
         self.goals: List[Goal] = []
@@ -464,20 +457,23 @@ class CognitiveArchitecture:
     def enhanced_memory_management(self, memory: Memory):
         """Enhance memory management with better logging and error handling"""
         try:
-            if self.use_unified_memory and self.unified_memory_system:
-                # Store in unified memory system
-                memory_node = memory.to_memory_node()
-                response = self.unified_memory_system.process({
-                    'operation': 'store',
-                    'content': memory_node.content,
-                    'memory_type': memory_node.memory_type.value,
-                    'echo_value': memory_node.echo_value,
-                    'metadata': memory_node.metadata
-                })
-                if response.success:
-                    self.logger.debug(f"Memory stored in unified system: {response.message}")
+            if self.use_unified_memory and self.memory_adapter:
+                # Store using unified memory adapter
+                memory_id = self.memory_adapter.create_legacy_memory(
+                    content=memory.content,
+                    memory_type=memory.memory_type.value,
+                    emotional_valence=memory.emotional_valence,
+                    importance=memory.importance,
+                    context=memory.context,
+                    associations=memory.associations
+                )
+                
+                if memory_id:
+                    self.logger.debug(f"Memory stored in unified system: {memory_id}")
+                    # Store memory ID in legacy storage for backward compatibility
+                    self.memories[memory_id] = memory
                 else:
-                    self.logger.error(f"Failed to store in unified system: {response.message}")
+                    self.logger.error("Failed to store in unified system")
                     # Fallback to legacy storage
                     self.memories[str(len(self.memories))] = memory
             else:
