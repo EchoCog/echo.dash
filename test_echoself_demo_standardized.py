@@ -293,6 +293,54 @@ class TestEchoselfDemoStandardized(unittest.TestCase):
             self.assertIn("error_type", result.metadata)
 
     @unittest.skipIf(not ECHOSELF_DEMO_STANDARDIZED_AVAILABLE, "Module not available")
+    def test_integration_info_operation(self):
+        """Test integration info operation"""
+        config = EchoConfig(component_name="TestEchoselfDemo")
+        component = EchoselfDemoStandardized(config)
+        
+        # Set up for testing (even without cognitive system)
+        component._initialized = True
+        
+        # Test integration info operation
+        result = component.process("integration_info")
+        self.assertTrue(result.success)
+        self.assertIn("fragment_type", result.data)
+        self.assertEqual(result.data["fragment_type"], "EXTENSION")
+        self.assertIn("integration_level", result.data)
+        self.assertIn("metrics", result.data)
+
+    @unittest.skipIf(not ECHOSELF_DEMO_STANDARDIZED_AVAILABLE, "Module not available")
+    def test_enhanced_echo_operation(self):
+        """Test enhanced echo operation with integration metrics"""
+        config = EchoConfig(component_name="TestEchoselfDemo")
+        component = EchoselfDemoStandardized(config)
+        
+        # Echo should work even without initialization
+        result = component.echo("test_data", echo_value=0.85)
+        
+        self.assertTrue(result.success)
+        self.assertEqual(result.data['echo_value'], 0.85)
+        self.assertIn('integration_metrics', result.data)
+        self.assertIn('component_status', result.data)
+        self.assertEqual(result.data['component_status']['type'], 'EXTENSION')
+        self.assertIn('integration_score', result.metadata)
+
+    @unittest.skipIf(not ECHOSELF_DEMO_STANDARDIZED_AVAILABLE, "Module not available")
+    def test_integration_metrics_calculation(self):
+        """Test integration metrics calculation"""
+        config = EchoConfig(component_name="TestEchoselfDemo")
+        component = EchoselfDemoStandardized(config)
+        
+        # Test metrics calculation method
+        metrics = component._calculate_integration_metrics()
+        
+        self.assertIn('integration_score', metrics)
+        self.assertIn('component_readiness', metrics)
+        self.assertIn('standardized_interface', metrics)
+        self.assertTrue(metrics['standardized_interface'])
+        self.assertTrue(metrics['memory_component_based'])
+
+    @unittest.skipIf(not ECHOSELF_DEMO_STANDARDIZED_AVAILABLE, "Module not available")
     def test_component_info_compatibility(self):
         """Test that component provides expected information"""
         config = EchoConfig(component_name="TestEchoselfDemo", version="1.2.3")
