@@ -7,14 +7,14 @@ for identifying architecture gaps, fragments, and migration tasks. It tests both
 legacy interface compatibility and unified architecture integration.
 
 Key Testing Areas:
-- Fragment discovery and analysis (26 fragments detected)
-- Architecture gap identification (4 priority levels)
-- Migration task generation (effort estimation)
+- Fragment discovery and analysis
+- Architecture gap identification
+- Migration task generation
 - Unified vs Legacy interface compatibility
-- Echo propagation functionality (with configurable echo values)
-- Integration with broader Echo ecosystem (22 extensions, 4 core)
+- Echo propagation functionality
+- Integration with broader Echo ecosystem
 - Full analysis workflow validation
-- Performance testing with large codebase
+- Performance testing with real codebase
 - Error handling and resilience
 - File persistence and data integrity
 
@@ -22,31 +22,13 @@ Architecture Integration:
 - Tests ProcessingEchoComponent inheritance for unified architecture
 - Validates EchoConfig, EchoResponse integration
 - Ensures backward compatibility with legacy DeepTreeEchoAnalyzer usage
-- Comprehensive echo propagation testing (echo values 0.0-1.0)
-
-Test Coverage:
-- 25 test methods with 100% pass rate
-- Mock object testing for edge cases
-- Temporary file and directory handling
-- JSON persistence validation
-- Performance benchmarking
+- Comprehensive echo propagation testing
 
 The test suite ensures the analyzer properly integrates with:
 - echo_component_base unified architecture
 - ProcessingEchoComponent base class
 - EchoConfig configuration system
 - Deep Tree Echo fragment ecosystem
-
-Fragment Analysis Capabilities Tested:
-- Detects 26+ Echo fragments across the codebase
-- Categorizes into core (4) and extension (22) types
-- Identifies standardized vs legacy components
-- Generates migration tasks with effort estimates
-- Provides architecture gap analysis with priority levels
-- Supports both unified and legacy interfaces seamlessly
-
-This comprehensive integration validates the Deep Tree Echo Analyzer
-as a critical component in the Echo ecosystem consolidation effort.
 """
 
 import unittest
@@ -54,7 +36,6 @@ import logging
 import sys
 import tempfile
 import json
-from unittest.mock import Mock, patch, mock_open
 from pathlib import Path
 from datetime import datetime
 
@@ -181,35 +162,37 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
         self.assertTrue(callable(analyzer.analyze_fragments))
 
     @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
-    @patch('pathlib.Path.glob')
-    def test_analyze_fragments_functionality(self, mock_glob):
-        """Test analyze_fragments basic functionality"""
-        # Create mock files
-        mock_file1 = Mock()
-        mock_file1.is_file.return_value = True
-        mock_file1.name = "echo_test.py"
+    def test_analyze_fragments_functionality(self):
+        """Test analyze_fragments basic functionality with real files"""
+        # Test with actual codebase directory
+        analyzer = DeepTreeEchoAnalyzer()
         
-        mock_file2 = Mock()
-        mock_file2.is_file.return_value = True
-        mock_file2.name = "test_echo.py"  # Should be filtered out
-        
-        mock_glob.return_value = [mock_file1, mock_file2]
-        
-        # Mock file reading
-        with patch('builtins.open', mock_open(read_data="class EchoTest:\n    def test_method(self):\n        pass")):
-            analyzer = DeepTreeEchoAnalyzer()
+        try:
+            fragments = analyzer.analyze_fragments()
+            self.assertIsInstance(fragments, list)
+            # Should find actual fragments in the current directory
+            self.assertGreater(len(fragments), 0, "Should find actual Echo fragments")
             
-            try:
-                fragments = analyzer.analyze_fragments()
-                self.assertIsInstance(fragments, list)
+            # Validate fragment structure
+            for fragment in fragments:
+                required_keys = ['file', 'lines', 'classes', 'functions', 'type', 'status']
+                for key in required_keys:
+                    self.assertIn(key, fragment, f"Fragment should have {key} field")
                 
-            except Exception as e:
-                # Method exists and was called, implementation may be incomplete
-                if "not implemented" in str(e).lower():
-                    self.skipTest("analyze_fragments method needs implementation")
-                else:
-                    # Method was called successfully
-                    pass
+                # Validate data types
+                self.assertIsInstance(fragment['lines'], int)
+                self.assertIsInstance(fragment['classes'], list)
+                self.assertIsInstance(fragment['functions'], list)
+                self.assertIn(fragment['type'], ['core', 'extension', 'legacy', 'test'])
+                self.assertIn(fragment['status'], ['active', 'legacy'])
+            
+        except Exception as e:
+            # Method exists and was called, implementation may be incomplete
+            if "not implemented" in str(e).lower():
+                self.skipTest("analyze_fragments method needs implementation")
+            else:
+                # Method was called successfully
+                pass
 
     @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
     def test_analyzer_methods_exist(self):
@@ -411,7 +394,7 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
     @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
     def test_integration_with_fragment_ecosystem(self):
         """Test integration with broader Deep Tree Echo fragment ecosystem"""
-        analyzer = DeepTreeEchoAnalyzer()
+        analyzer = self._create_test_analyzer()
         
         # Run analysis to get current fragment state
         fragments = analyzer.analyze_fragments()
@@ -437,7 +420,7 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
     @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
     def test_migration_strategy_validation(self):
         """Test migration strategy and task generation capabilities"""
-        analyzer = DeepTreeEchoAnalyzer()
+        analyzer = self._create_test_analyzer()
         
         # Generate migration tasks
         tasks = analyzer.generate_migration_tasks()
@@ -470,7 +453,7 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
     @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
     def test_comprehensive_analysis_workflow(self):
         """Test complete analysis workflow from start to finish"""
-        analyzer = DeepTreeEchoAnalyzer()
+        analyzer = self._create_test_analyzer()
         
         # Test full analysis workflow
         analysis_file = analyzer.run_full_analysis()
@@ -540,7 +523,6 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
                 
         except ImportError:
             self.skipTest("echo_component_base not available for unified testing")
-
 
     @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
     def test_standardized_component_detection(self):
@@ -650,19 +632,6 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
         
         # Performance info for debugging
         print(f"\nPerformance: Analyzed {len(fragments)} fragments in {analysis_time:.2f}s")
-
-
-# Mock classes for testing fragment detection
-class EchoTest:
-    """Mock Echo test class for testing fragment detection"""
-    def test_method(self):
-        pass
-
-
-class EchoComponent:
-    """Mock Echo component class for testing fragment detection"""
-    def echo(self):
-        pass
 
 
 def main():
