@@ -616,6 +616,95 @@ class UnifiedEchoMemory(MemoryEchoComponent):
         except Exception as e:
             return self.handle_error(e, "_process_search_operation")
     
+    def _process_update_operation(self, data: Dict) -> EchoResponse:
+        """Process memory update operation"""
+        try:
+            memory_id = data.get('memory_id')
+            if not memory_id:
+                return EchoResponse(
+                    success=False,
+                    message="Memory ID required for update operation"
+                )
+            
+            # Get existing memory
+            existing_memory = self.memory_manager.get_node(memory_id)
+            if not existing_memory:
+                return EchoResponse(
+                    success=False,
+                    message=f"Memory not found: {memory_id}"
+                )
+            
+            # Update fields
+            if 'content' in data:
+                existing_memory.content = data['content']
+            
+            if 'echo_value' in data:
+                existing_memory.echo_value = data['echo_value']
+            
+            if 'metadata' in data:
+                if existing_memory.metadata is None:
+                    existing_memory.metadata = {}
+                existing_memory.metadata.update(data['metadata'])
+            
+            # Update access time
+            existing_memory.access()
+            
+            # Update working memory
+            if memory_id not in self.echo_working_memory:
+                self.echo_working_memory.append(memory_id)
+            
+            self._update_operation_stats('update')
+            
+            return EchoResponse(
+                success=True,
+                data={'memory_id': memory_id, 'updated_fields': list(data.keys())},
+                message=f"Memory updated successfully: {memory_id}",
+                metadata={'memory_id': memory_id}
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "_process_update_operation")
+        
+    def _process_delete_operation(self, data: Dict) -> EchoResponse:
+        """Process memory delete operation"""
+        try:
+            memory_id = data.get('memory_id')
+            if not memory_id:
+                return EchoResponse(
+                    success=False,
+                    message="Memory ID required for delete operation"
+                )
+            
+            # Check if memory exists
+            existing_memory = self.memory_manager.get_node(memory_id)
+            if not existing_memory:
+                return EchoResponse(
+                    success=False,
+                    message=f"Memory not found: {memory_id}"
+                )
+            
+            # Remove from memory manager
+            if hasattr(self.memory_manager, 'remove_node'):
+                self.memory_manager.remove_node(memory_id)
+            elif hasattr(self.memory_manager, 'nodes'):
+                self.memory_manager.nodes.pop(memory_id, None)
+            
+            # Remove from working memory
+            if memory_id in self.echo_working_memory:
+                self.echo_working_memory.remove(memory_id)
+            
+            self._update_operation_stats('delete')
+            
+            return EchoResponse(
+                success=True,
+                data={'memory_id': memory_id},
+                message=f"Memory deleted successfully: {memory_id}",
+                metadata={'memory_id': memory_id}
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "_process_delete_operation")
+    
     def _process_analyze_operation(self, data: Dict) -> EchoResponse:
         """Process memory analysis operation"""
         try:
