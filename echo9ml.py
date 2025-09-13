@@ -14,7 +14,12 @@ evolution within a ggml-inspired framework. This module provides:
 Based on the architectural specification in echo9ml.md
 """
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    # Use mock numpy for testing when numpy is not available
+    import mock_numpy as np
+
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Any, Set
 from enum import Enum

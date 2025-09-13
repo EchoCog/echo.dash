@@ -6,7 +6,11 @@ according to the specifications in echo9ml.md
 """
 
 import unittest
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    # Use mock numpy for testing when numpy is not available
+    import mock_numpy as np
 import tempfile
 import json
 from pathlib import Path
