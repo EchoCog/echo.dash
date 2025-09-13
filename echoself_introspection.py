@@ -6,6 +6,11 @@ Inspired by DeepTreeEcho/Eva Self Model and echoself.md
 
 This module implements the recursive self-model integration with hypergraph encoding
 and adaptive attention allocation as specified in the Echoself vision.
+
+Standardized API Integration:
+- Implements standardized Echo component interface
+- Maintains backward compatibility with original interfaces
+- Provides unified configuration and response handling
 """
 
 import os
@@ -16,6 +21,16 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple, Union
 from dataclasses import dataclass, field
 from collections import defaultdict
+
+# Import standardized Echo components
+try:
+    from echo_component_base import MemoryEchoComponent, EchoConfig, EchoResponse
+    ECHO_STANDARDIZED_AVAILABLE = True
+except ImportError:
+    MemoryEchoComponent = object
+    EchoConfig = None
+    EchoResponse = None
+    ECHO_STANDARDIZED_AVAILABLE = False
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -732,6 +747,336 @@ class EchoselfIntrospector:
             'nodes': [node.to_dict() for node in nodes],
             'repository_root': str(self.repository_root)
         }
+
+
+class EchoselfIntrospectionStandardized(MemoryEchoComponent):
+    """
+    Standardized wrapper for Echoself introspection system
+    
+    Provides Echo component interface while maintaining full backward compatibility
+    with the original EchoselfIntrospector interface.
+    """
+    
+    def __init__(self, config: EchoConfig):
+        if not ECHO_STANDARDIZED_AVAILABLE:
+            raise ImportError("Echo standardized components not available")
+            
+        super().__init__(config)
+        
+        # Extract Echoself-specific configuration
+        repository_root = config.custom_params.get('repository_root', None)
+        if repository_root:
+            repository_root = Path(repository_root)
+        
+        # Initialize the core Echoself introspection system
+        self.echoself_introspector = EchoselfIntrospector(repository_root)
+        
+        # Track introspection statistics
+        self.introspection_count = 0
+        self.cognitive_snapshots = []
+        self.prompt_history = []
+        
+        # Configuration parameters
+        self.default_load = config.custom_params.get('default_load', 0.6)
+        self.default_activity = config.custom_params.get('default_activity', 0.4)
+        self.max_snapshots = config.custom_params.get('max_snapshots', 10)
+        
+    def initialize(self) -> EchoResponse:
+        """Initialize the Echoself introspection system"""
+        try:
+            self._initialized = True
+            
+            # Store initial repository information
+            repo_path = str(self.echoself_introspector.repository_root)
+            initial_data = {
+                'repository_root': repo_path,
+                'default_load': self.default_load,
+                'default_activity': self.default_activity,
+                'components_initialized': {
+                    'introspector': True,
+                    'serializer': True,
+                    'attention_allocator': True
+                }
+            }
+            
+            # Store in memory
+            self.store_memory('initialization', initial_data)
+            
+            self.logger.info(f"Echoself introspection system initialized for repository: {repo_path}")
+            
+            return EchoResponse(
+                success=True,
+                message="Echoself introspection system initialized successfully",
+                data=initial_data,
+                metadata={
+                    'system_type': 'EchoselfIntrospection',
+                    'repository_root': repo_path
+                }
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "initialize")
+    
+    def process(self, input_data: Any, **kwargs) -> EchoResponse:
+        """
+        Process introspection requests
+        
+        Args:
+            input_data: Request type (string) or introspection parameters (dict)
+            **kwargs: Additional processing parameters (current_load, recent_activity)
+        
+        Returns:
+            EchoResponse with introspection results
+        """
+        try:
+            if not self._initialized:
+                return EchoResponse(
+                    success=False,
+                    message="Component not initialized - call initialize() first"
+                )
+                
+            # Validate input
+            validation = self.validate_input(input_data)
+            if not validation.success:
+                return validation
+            
+            # Extract parameters
+            current_load = kwargs.get('current_load', self.default_load)
+            recent_activity = kwargs.get('recent_activity', self.default_activity)
+            
+            if isinstance(input_data, dict):
+                current_load = input_data.get('current_load', current_load)
+                recent_activity = input_data.get('recent_activity', recent_activity)
+                request_type = input_data.get('type', 'cognitive_snapshot')
+            elif isinstance(input_data, str):
+                request_type = input_data.lower()
+            else:
+                request_type = 'cognitive_snapshot'
+            
+            # Process based on request type
+            if request_type == 'prompt' or request_type == 'inject_prompt':
+                # Generate introspection prompt
+                prompt = self.echoself_introspector.inject_repo_input_into_prompt(
+                    current_load, recent_activity
+                )
+                
+                # Store in memory and history
+                prompt_data = {
+                    'prompt': prompt,
+                    'current_load': current_load,
+                    'recent_activity': recent_activity,
+                    'timestamp': time.time()
+                }
+                
+                memory_key = f"prompt_{self.introspection_count}"
+                self.store_memory(memory_key, prompt_data)
+                self.prompt_history.append(prompt_data)
+                
+                result_data = {
+                    'prompt': prompt,
+                    'prompt_length': len(prompt),
+                    'parameters': {'current_load': current_load, 'recent_activity': recent_activity}
+                }
+                
+                message = f"Introspection prompt generated ({len(prompt)} chars)"
+                
+            elif request_type == 'cognitive_snapshot' or request_type == 'snapshot':
+                # Generate cognitive snapshot
+                snapshot = self.echoself_introspector.get_cognitive_snapshot(
+                    current_load, recent_activity
+                )
+                
+                # Store in memory and history
+                snapshot_data = {
+                    'snapshot': snapshot,
+                    'current_load': current_load,
+                    'recent_activity': recent_activity,
+                    'timestamp': time.time()
+                }
+                
+                memory_key = f"snapshot_{self.introspection_count}"
+                self.store_memory(memory_key, snapshot_data)
+                
+                # Maintain limited history
+                self.cognitive_snapshots.append(snapshot_data)
+                if len(self.cognitive_snapshots) > self.max_snapshots:
+                    self.cognitive_snapshots.pop(0)
+                
+                result_data = snapshot
+                message = f"Cognitive snapshot generated ({snapshot.get('total_files_processed', 0)} files)"
+                
+            else:
+                return EchoResponse(
+                    success=False,
+                    message=f"Unknown request type: {request_type}",
+                    metadata={'valid_types': ['prompt', 'inject_prompt', 'cognitive_snapshot', 'snapshot']}
+                )
+            
+            self.introspection_count += 1
+            
+            return EchoResponse(
+                success=True,
+                data=result_data,
+                message=message,
+                metadata={
+                    'request_type': request_type,
+                    'introspection_count': self.introspection_count,
+                    'current_load': current_load,
+                    'recent_activity': recent_activity
+                }
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "process")
+    
+    def echo(self, data: Any, echo_value: float = 0.0) -> EchoResponse:
+        """
+        Perform echo operation with introspection
+        
+        Args:
+            data: Data to reflect upon
+            echo_value: Echo intensity (affects introspection depth)
+        
+        Returns:
+            EchoResponse with echo-enhanced introspection
+        """
+        try:
+            # Use echo_value to adjust introspection parameters
+            # Higher echo values = more intensive introspection
+            adjusted_load = min(1.0, self.default_load + (echo_value * 0.3))
+            adjusted_activity = min(1.0, self.default_activity + (echo_value * 0.2))
+            
+            # Generate both prompt and snapshot for echo operation
+            prompt = self.echoself_introspector.inject_repo_input_into_prompt(
+                adjusted_load, adjusted_activity
+            )
+            
+            snapshot = self.echoself_introspector.get_cognitive_snapshot(
+                adjusted_load, adjusted_activity
+            )
+            
+            # Create echo-enhanced data
+            echo_data = {
+                'original_data': data,
+                'echo_value': echo_value,
+                'adjusted_parameters': {
+                    'current_load': adjusted_load,
+                    'recent_activity': adjusted_activity
+                },
+                'introspection_prompt': prompt,
+                'cognitive_snapshot': snapshot,
+                'reflection': {
+                    'prompt_length': len(prompt),
+                    'files_processed': snapshot.get('total_files_processed', 0),
+                    'average_salience': snapshot.get('average_salience', 0.0),
+                    'attention_threshold': snapshot.get('attention_threshold', 0.0)
+                },
+                'timestamp': time.time()
+            }
+            
+            # Store echo reflection in memory
+            memory_key = f"echo_reflection_{self.introspection_count}"
+            self.store_memory(memory_key, echo_data)
+            self.introspection_count += 1
+            
+            return EchoResponse(
+                success=True,
+                data=echo_data,
+                message=f"Echo introspection completed (value: {echo_value}, depth: {adjusted_load:.2f})",
+                metadata={
+                    'echo_value': echo_value,
+                    'adjusted_load': adjusted_load,
+                    'adjusted_activity': adjusted_activity,
+                    'introspection_count': self.introspection_count
+                }
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "echo")
+    
+    def get_introspection_history(self) -> EchoResponse:
+        """Get history of introspection operations"""
+        try:
+            history_data = {
+                'introspection_count': self.introspection_count,
+                'recent_snapshots': len(self.cognitive_snapshots),
+                'recent_prompts': len(self.prompt_history),
+                'memory_entries': len(self.memory_store),
+                'snapshots': self.cognitive_snapshots[-3:],  # Last 3 snapshots
+                'repository_root': str(self.echoself_introspector.repository_root)
+            }
+            
+            return EchoResponse(
+                success=True,
+                data=history_data,
+                message="Introspection history retrieved"
+            )
+        except Exception as e:
+            return self.handle_error(e, "get_introspection_history")
+    
+    def export_hypergraph_data(self, output_path: str) -> EchoResponse:
+        """Export hypergraph data through the introspector"""
+        try:
+            # Use the introspector's export functionality
+            nodes = self.echoself_introspector.introspector.assemble_hypergraph_input(
+                self.echoself_introspector.repository_root, 
+                self.echoself_introspector.attention_allocator.adaptive_attention(
+                    self.default_load, self.default_activity
+                )
+            )
+            
+            # Export hypergraph data
+            export_data = {
+                'nodes': [node.to_dict() for node in nodes],
+                'metadata': {
+                    'export_timestamp': time.time(),
+                    'repository_root': str(self.echoself_introspector.repository_root),
+                    'node_count': len(nodes),
+                    'component_name': self.config.component_name
+                }
+            }
+            
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(export_data, f, indent=2)
+            
+            return EchoResponse(
+                success=True,
+                data={'output_path': output_path, 'node_count': len(nodes)},
+                message=f"Hypergraph data exported to {output_path}"
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "export_hypergraph_data")
+
+
+def create_echoself_introspection_standardized(repository_root: Optional[str] = None,
+                                             component_name: str = "EchoselfIntrospection",
+                                             version: str = "1.0.0") -> EchoselfIntrospectionStandardized:
+    """Create and initialize a new standardized Echoself introspection component"""
+    if not ECHO_STANDARDIZED_AVAILABLE:
+        raise ImportError("Echo standardized components not available")
+    
+    config = EchoConfig(
+        component_name=component_name,
+        version=version,
+        echo_threshold=0.6,  # Moderate threshold for introspection
+        debug_mode=False,
+        custom_params={
+            'repository_root': repository_root,
+            'default_load': 0.6,
+            'default_activity': 0.4,
+            'max_snapshots': 10
+        }
+    )
+    
+    component = EchoselfIntrospectionStandardized(config)
+    result = component.initialize()
+    
+    if not result.success:
+        raise RuntimeError(f"Failed to initialize Echoself introspection component: {result.message}")
+    
+    return component
+
 
 # Example usage and integration point
 def main():
