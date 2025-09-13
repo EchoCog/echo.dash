@@ -34,20 +34,38 @@ The documentation includes 36 specialized Mermaid diagrams covering:
 - Emotional dynamics and personality evolution
 - Distributed processing and swarm coordination
 
+## 🚀 Quick Start
+
+The easiest way to launch Deep Tree Echo is with the unified launcher:
+
+```bash
+# Quick launch with default GUI
+python launch.py
+
+# View all available launch modes
+python launch.py --list-modes
+
+# Launch specific modes
+python launch.py deep-tree-echo --gui    # Full system with GUI
+python launch.py dashboards             # Both GUI and web dashboards
+python launch.py web --port 8080        # Web dashboard only
+python launch.py gui-standalone         # Lightweight GUI
+```
+
 ## System Monitoring & Diagnostics
 
 Deep Tree Echo includes two complementary dashboard interfaces for system monitoring and diagnostics:
 
-### Combined Dashboard Launcher
+### Unified Launch Interface
 
-For convenience, you can launch both dashboards simultaneously with:
+The `launch.py` script consolidates all launch functionality into a single, easy-to-use interface:
 
 ```bash
 # Launch both GUI and web dashboards
-./launch_dashboards.py
+python launch.py dashboards
 
 # Launch only one dashboard if needed
-./launch_dashboards.py --gui-only  # GUI dashboard only
+python launch.py dashboards --gui-only  # GUI dashboard only
 ./launch_dashboards.py --web-only  # Web dashboard only
 
 # Specify a different port for the web dashboard
@@ -289,3 +307,13 @@ print(f"Predicted Echo Value: {predicted_echo}")
 
 - Update the configuration files in the `deep_tree_echo_profile` directory to match your setup.
 - Adjust the parameters in `deep_tree_echo.py` to fine-tune the echo propagation, analysis, and machine learning integration.
+
+## Legacy Launch Scripts
+
+For backward compatibility, the original launch scripts are still available:
+- `launch_deep_tree_echo.py` - Full system launcher
+- `launch_dashboards.py` - Dashboard manager
+- `launch_gui.py` - GUI dashboard launcher  
+- `launch_gui_standalone.py` - Standalone GUI launcher
+
+However, **we recommend using `python launch.py` for all new usage** as it provides a unified interface with better error handling, comprehensive help, and clearer mode selection.
