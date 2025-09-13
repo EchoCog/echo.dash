@@ -1,0 +1,79 @@
+{
+  "test_session_id": "echo_api_test_20250913_184252",
+  "total_duration": 0.0011703968048095703,
+  "tests_run": 5,
+  "tests_passed": 4,
+  "overall_success_rate": 0.9333333333333333,
+  "component_compatibility_score": 0.9285714285714286,
+  "integration_quality_score": 0.8833333333333333,
+  "test_metrics": [
+    {
+      "test_name": "Standardized Interfaces",
+      "duration": 0.00036978721618652344,
+      "components_tested": 3,
+      "components_passed": 3,
+      "components_failed": 0,
+      "success_rate": 1.0,
+      "errors": [],
+      "warnings": [],
+      "timestamp": "2025-09-13T18:42:52.997799"
+    },
+    {
+      "test_name": "Cross-Component Communication",
+      "duration": 0.00023436546325683594,
+      "components_tested": 2,
+      "components_passed": 2,
+      "components_failed": 0,
+      "success_rate": 1.0,
+      "errors": [],
+      "warnings": [
+        "Low format compatibility: 0.33"
+      ],
+      "timestamp": "2025-09-13T18:42:52.998167"
+    },
+    {
+      "test_name": "Configuration Consistency",
+      "duration": 0.0003955364227294922,
+      "components_tested": 3,
+      "components_passed": 3,
+      "components_failed": 0,
+      "success_rate": 1.0,
+      "errors": [],
+      "warnings": [],
+      "timestamp": "2025-09-13T18:42:52.998407"
+    },
+    {
+      "test_name": "Error Handling Standardization",
+      "duration": 0.00015783309936523438,
+      "components_tested": 3,
+      "components_passed": 3,
+      "components_failed": 0,
+      "success_rate": 1.0,
+      "errors": [],
+      "warnings": [],
+      "timestamp": "2025-09-13T18:42:52.998806"
+    },
+    {
+      "test_name": "Backward Compatibility",
+      "duration": 1.2874603271484375e-05,
+      "components_tested": 3,
+      "components_passed": 2,
+      "components_failed": 0,
+      "success_rate": 0.6666666666666666,
+      "errors": [],
+      "warnings": [],
+      "timestamp": "2025-09-13T18:42:52.998969"
+    }
+  ],
+  "recommendations": [
+    "Address current issues before proceeding with medium complexity migrations"
+  ],
+  "next_migration_targets": [
+    "deep_tree_echo_analyzer.py",
+    "trigger_echopilot.py",
+    "echo_evolution.py",
+    "echo9ml_demo.py",
+    "echo9ml_integration.py"
+  ],
+  "timestamp": "2025-09-13T18:42:52.999009"
+}

@@ -191,13 +191,19 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
             
             # Create config from arguments or use provided config
             if args_dict:
-                # Create mock args object from dictionary
-                class MockArgs:
-                    def __init__(self, args_dict):
-                        for key, value in args_dict.items():
-                            setattr(self, key, value)
+                # Create real args object using argparse with proper defaults
+                parser = create_argument_parser(config_name)
                 
-                args = MockArgs(args_dict)
+                # Convert dict to command line arguments
+                cmd_args = []
+                for key, value in args_dict.items():
+                    if isinstance(value, bool) and value:
+                        cmd_args.append(f"--{key.replace('_', '-')}")
+                    elif not isinstance(value, bool):
+                        cmd_args.extend([f"--{key.replace('_', '-')}", str(value)])
+                
+                # Parse the constructed arguments
+                args = parser.parse_args(cmd_args)
                 config = create_config_from_args(config_name, args)
             else:
                 # Use default configuration
@@ -248,12 +254,19 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
         """Create configuration from arguments"""
         try:
             if args_dict:
-                class MockArgs:
-                    def __init__(self, args_dict):
-                        for key, value in args_dict.items():
-                            setattr(self, key, value)
+                # Create real args object using argparse with proper defaults
+                parser = create_argument_parser(config_name)
                 
-                args = MockArgs(args_dict)
+                # Convert dict to command line arguments
+                cmd_args = []
+                for key, value in args_dict.items():
+                    if isinstance(value, bool) and value:
+                        cmd_args.append(f"--{key.replace('_', '-')}")
+                    elif not isinstance(value, bool):
+                        cmd_args.extend([f"--{key.replace('_', '-')}", str(value)])
+                
+                # Parse the constructed arguments
+                args = parser.parse_args(cmd_args)
             else:
                 parser = create_argument_parser(config_name)
                 args = parser.parse_args([])
