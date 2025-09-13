@@ -1,9 +1,34 @@
 #!/usr/bin/env python3
 """
-Test script for Deep Tree Echo Analyzer module
+Comprehensive Test Suite for Deep Tree Echo Analyzer
 
-Tests the analysis tool functionality for identifying architecture gaps,
-fragments, and migration tasks.
+This enhanced test suite validates the Deep Tree Echo Analyzer functionality
+for identifying architecture gaps, fragments, and migration tasks. It tests both
+legacy interface compatibility and unified architecture integration.
+
+Key Testing Areas:
+- Fragment discovery and analysis
+- Architecture gap identification
+- Migration task generation
+- Unified vs Legacy interface compatibility
+- Echo propagation functionality
+- Integration with broader Echo ecosystem
+- Full analysis workflow validation
+- Performance testing with real codebase
+- Error handling and resilience
+- File persistence and data integrity
+
+Architecture Integration:
+- Tests ProcessingEchoComponent inheritance for unified architecture
+- Validates EchoConfig, EchoResponse integration
+- Ensures backward compatibility with legacy DeepTreeEchoAnalyzer usage
+- Comprehensive echo propagation testing
+
+The test suite ensures the analyzer properly integrates with:
+- echo_component_base unified architecture
+- ProcessingEchoComponent base class
+- EchoConfig configuration system
+- Deep Tree Echo fragment ecosystem
 """
 
 import unittest
@@ -11,7 +36,6 @@ import logging
 import sys
 import tempfile
 import json
-from unittest.mock import Mock, patch, mock_open
 from pathlib import Path
 from datetime import datetime
 
@@ -34,6 +58,47 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
         """Set up test fixtures"""
         # Suppress logging output during tests
         logging.getLogger().setLevel(logging.CRITICAL)
+        
+        # Store original working directory
+        self.original_cwd = Path.cwd()
+
+    def tearDown(self):
+        """Clean up after tests"""
+        # Restore original working directory
+        import os
+        os.chdir(self.original_cwd)
+        
+        # Clean up any temporary analysis files created during testing
+        analysis_files = [
+            Path("deep_tree_echo_analysis.json"),
+            Path("test_analysis.json")
+        ]
+        
+        for file_path in analysis_files:
+            if file_path.exists():
+                try:
+                    file_path.unlink()
+                except (OSError, PermissionError):
+                    # File might be in use, skip cleanup
+                    pass
+
+    def _create_test_analyzer(self, use_unified=False):
+        """Helper method to create analyzer instances for testing"""
+        if use_unified:
+            try:
+                from echo_component_base import EchoConfig
+                config = EchoConfig(
+                    component_name="TestAnalyzer",
+                    version="1.0.0",
+                    echo_threshold=0.75,
+                    debug_mode=True
+                )
+                return DeepTreeEchoAnalyzer(".", config)
+            except ImportError:
+                # Fall back to legacy if unified not available
+                return DeepTreeEchoAnalyzer(".")
+        else:
+            return DeepTreeEchoAnalyzer(".")
 
     def test_import_deep_tree_echo_analyzer(self):
         """Test that deep_tree_echo_analyzer module can be imported"""
@@ -97,35 +162,37 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
         self.assertTrue(callable(analyzer.analyze_fragments))
 
     @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
-    @patch('pathlib.Path.glob')
-    def test_analyze_fragments_functionality(self, mock_glob):
-        """Test analyze_fragments basic functionality"""
-        # Create mock files
-        mock_file1 = Mock()
-        mock_file1.is_file.return_value = True
-        mock_file1.name = "echo_test.py"
+    def test_analyze_fragments_functionality(self):
+        """Test analyze_fragments basic functionality with real files"""
+        # Test with actual codebase directory
+        analyzer = DeepTreeEchoAnalyzer()
         
-        mock_file2 = Mock()
-        mock_file2.is_file.return_value = True
-        mock_file2.name = "test_echo.py"  # Should be filtered out
-        
-        mock_glob.return_value = [mock_file1, mock_file2]
-        
-        # Mock file reading
-        with patch('builtins.open', mock_open(read_data="class EchoTest:\n    def test_method(self):\n        pass")):
-            analyzer = DeepTreeEchoAnalyzer()
+        try:
+            fragments = analyzer.analyze_fragments()
+            self.assertIsInstance(fragments, list)
+            # Should find actual fragments in the current directory
+            self.assertGreater(len(fragments), 0, "Should find actual Echo fragments")
             
-            try:
-                fragments = analyzer.analyze_fragments()
-                self.assertIsInstance(fragments, list)
+            # Validate fragment structure
+            for fragment in fragments:
+                required_keys = ['file', 'lines', 'classes', 'functions', 'type', 'status']
+                for key in required_keys:
+                    self.assertIn(key, fragment, f"Fragment should have {key} field")
                 
-            except Exception as e:
-                # Method exists and was called, implementation may be incomplete
-                if "not implemented" in str(e).lower():
-                    self.skipTest("analyze_fragments method needs implementation")
-                else:
-                    # Method was called successfully
-                    pass
+                # Validate data types
+                self.assertIsInstance(fragment['lines'], int)
+                self.assertIsInstance(fragment['classes'], list)
+                self.assertIsInstance(fragment['functions'], list)
+                self.assertIn(fragment['type'], ['core', 'extension', 'legacy', 'test'])
+                self.assertIn(fragment['status'], ['active', 'legacy'])
+            
+        except Exception as e:
+            # Method exists and was called, implementation may be incomplete
+            if "not implemented" in str(e).lower():
+                self.skipTest("analyze_fragments method needs implementation")
+            else:
+                # Method was called successfully
+                pass
 
     @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
     def test_analyzer_methods_exist(self):
@@ -288,6 +355,283 @@ class TestDeepTreeEchoAnalyzer(unittest.TestCase):
             
         except ImportError:
             self.skipTest("echo_component_base not available for inheritance testing")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_echo_propagation_functionality(self):
+        """Test echo propagation and enhanced analysis capabilities"""
+        try:
+            from echo_component_base import EchoConfig
+            
+            config = EchoConfig(
+                component_name='EchoPropagationTester',
+                version='1.0.0',
+                echo_threshold=0.5,
+                max_depth=5
+            )
+            
+            analyzer = DeepTreeEchoAnalyzer('.', config)
+            
+            # Test initialization
+            init_result = analyzer.initialize()
+            if hasattr(init_result, 'success'):
+                self.assertTrue(init_result.success)
+            
+            # Test echo operation with different values
+            echo_values = [0.0, 0.25, 0.5, 0.75, 1.0]
+            
+            for echo_val in echo_values:
+                result = analyzer.echo(data='.', echo_value=echo_val)
+                
+                if hasattr(result, 'success'):
+                    self.assertTrue(result.success, f"Echo failed for value {echo_val}")
+                    if hasattr(result, 'metadata'):
+                        self.assertIn('echo_value', result.metadata)
+                        self.assertEqual(result.metadata['echo_value'], echo_val)
+                        
+        except ImportError:
+            self.skipTest("echo_component_base not available for echo testing")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_integration_with_fragment_ecosystem(self):
+        """Test integration with broader Deep Tree Echo fragment ecosystem"""
+        analyzer = self._create_test_analyzer()
+        
+        # Run analysis to get current fragment state
+        fragments = analyzer.analyze_fragments()
+        
+        # Verify we can detect key ecosystem components
+        fragment_files = [f['file'] for f in fragments]
+        
+        # Should find core deep tree echo files
+        core_files_found = any('deep_tree_echo.py' in f for f in fragment_files)
+        self.assertTrue(core_files_found, "Should detect core deep_tree_echo.py")
+        
+        # Should find standardized components
+        standardized_files = [f for f in fragment_files if 'standardized' in f]
+        self.assertGreater(len(standardized_files), 0, "Should find standardized components")
+        
+        # Should categorize files properly
+        extension_fragments = [f for f in fragments if f['type'] == 'extension']
+        core_fragments = [f for f in fragments if f['type'] == 'core']
+        
+        self.assertGreater(len(extension_fragments), 0, "Should identify extension fragments")
+        self.assertGreater(len(core_fragments), 0, "Should identify core fragments")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_migration_strategy_validation(self):
+        """Test migration strategy and task generation capabilities"""
+        analyzer = self._create_test_analyzer()
+        
+        # Generate migration tasks
+        tasks = analyzer.generate_migration_tasks()
+        
+        # Should generate meaningful tasks
+        self.assertIsInstance(tasks, list)
+        self.assertGreater(len(tasks), 0, "Should generate migration tasks")
+        
+        # Validate task structure
+        for task in tasks:
+            required_keys = ['task', 'description', 'type', 'estimated_effort']
+            for key in required_keys:
+                self.assertIn(key, task, f"Task should have {key} field")
+            
+            # Validate effort estimates
+            self.assertIn(task['estimated_effort'], 
+                         ['small', 'medium', 'large'], 
+                         "Should have valid effort estimate")
+        
+        # Should identify architecture gaps
+        gaps = analyzer.identify_architecture_gaps()
+        self.assertIsInstance(gaps, list)
+        
+        # Validate gap structure
+        for gap in gaps:
+            required_keys = ['gap', 'description', 'priority']
+            for key in required_keys:
+                self.assertIn(key, gap, f"Gap should have {key} field")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_comprehensive_analysis_workflow(self):
+        """Test complete analysis workflow from start to finish"""
+        analyzer = self._create_test_analyzer()
+        
+        # Test full analysis workflow
+        analysis_file = analyzer.run_full_analysis()
+        
+        # Verify analysis file was created
+        self.assertTrue(analysis_file.exists(), "Analysis file should be created")
+        
+        # Verify analysis results structure
+        results = analyzer.results
+        expected_sections = ['fragments', 'architecture_gaps', 'migration_tasks', 
+                           'recommendations', 'analysis_timestamp']
+        
+        for section in expected_sections:
+            self.assertIn(section, results, f"Results should include {section}")
+        
+        # Verify timestamp is recent and valid
+        timestamp = results['analysis_timestamp']
+        self.assertIsInstance(timestamp, str)
+        
+        # Parse timestamp to ensure it's valid ISO format
+        from datetime import datetime
+        try:
+            parsed_time = datetime.fromisoformat(timestamp.replace('T', ' ').replace('Z', ''))
+            self.assertIsInstance(parsed_time, datetime)
+        except ValueError:
+            self.fail(f"Invalid timestamp format: {timestamp}")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_unified_vs_legacy_interface_compatibility(self):
+        """Test compatibility between unified and legacy interfaces"""
+        # Test legacy interface
+        legacy_analyzer = DeepTreeEchoAnalyzer(".")
+        legacy_fragments = legacy_analyzer.analyze_fragments()
+        
+        # Test unified interface
+        try:
+            from echo_component_base import EchoConfig
+            
+            config = EchoConfig(component_name="UnifiedTester", version="1.0.0")
+            unified_analyzer = DeepTreeEchoAnalyzer(".", config)
+            
+            # Initialize unified analyzer
+            init_result = unified_analyzer.initialize()
+            if hasattr(init_result, 'success'):
+                self.assertTrue(init_result.success)
+            
+            unified_fragments = unified_analyzer.analyze_fragments()
+            
+            # Both should produce similar results
+            self.assertEqual(len(legacy_fragments), len(unified_fragments),
+                           "Legacy and unified interfaces should find same fragments")
+            
+            # Both should have same core functionality
+            legacy_methods = [method for method in dir(legacy_analyzer) 
+                            if not method.startswith('_') and callable(getattr(legacy_analyzer, method))]
+            unified_methods = [method for method in dir(unified_analyzer) 
+                             if not method.startswith('_') and callable(getattr(unified_analyzer, method))]
+            
+            # Unified should have all legacy methods plus additional ones
+            for method in ['analyze_fragments', 'run_full_analysis']:
+                self.assertIn(method, legacy_methods, f"Legacy should have {method}")
+                self.assertIn(method, unified_methods, f"Unified should have {method}")
+            
+            # Unified should have additional interface methods
+            for method in ['initialize', 'process', 'echo']:
+                self.assertIn(method, unified_methods, f"Unified should have {method}")
+                
+        except ImportError:
+            self.skipTest("echo_component_base not available for unified testing")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_standardized_component_detection(self):
+        """Test detection and analysis of standardized Echo components"""
+        analyzer = self._create_test_analyzer()
+        
+        fragments = analyzer.analyze_fragments()
+        
+        # Find standardized components
+        standardized_fragments = [f for f in fragments if 'standardized' in f['file']]
+        
+        # Should detect multiple standardized components
+        self.assertGreater(len(standardized_fragments), 0, 
+                          "Should detect standardized Echo components")
+        
+        # Validate standardized fragment structure
+        for fragment in standardized_fragments:
+            self.assertEqual(fragment['type'], 'extension', 
+                           "Standardized components should be classified as extensions")
+            self.assertEqual(fragment['status'], 'active',
+                           "Standardized components should be active")
+            self.assertGreater(fragment['lines'], 0,
+                             "Standardized components should have code content")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_analysis_file_persistence(self):
+        """Test that analysis results can be saved and loaded correctly"""
+        analyzer = self._create_test_analyzer()
+        
+        # Run analysis and save to custom file
+        analyzer.run_full_analysis()
+        custom_file = analyzer.save_analysis('test_analysis.json')
+        
+        self.assertTrue(custom_file.exists(), "Custom analysis file should be created")
+        
+        # Load and validate the saved analysis
+        import json
+        with open(custom_file, 'r') as f:
+            saved_results = json.load(f)
+        
+        # Validate saved structure matches in-memory results
+        self.assertEqual(saved_results.keys(), analyzer.results.keys(),
+                        "Saved results should match in-memory structure")
+        
+        for key in analyzer.results.keys():
+            if key != 'analysis_timestamp':  # Timestamps might differ slightly
+                self.assertEqual(len(saved_results[key]), len(analyzer.results[key]),
+                               f"Saved {key} should match in-memory data")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_error_handling_and_resilience(self):
+        """Test analyzer resilience to edge cases and error conditions"""
+        
+        # Test with non-existent directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            non_existent = Path(temp_dir) / "non_existent"
+            analyzer = DeepTreeEchoAnalyzer(str(non_existent))
+            
+            # Should handle gracefully
+            try:
+                fragments = analyzer.analyze_fragments()
+                self.assertIsInstance(fragments, list)
+                # Should return empty list for non-existent directory
+                self.assertEqual(len(fragments), 0)
+            except Exception as e:  
+                # Should not raise unhandled exceptions
+                self.fail(f"Analyzer should handle non-existent directory gracefully: {e}")
+        
+        # Test with directory containing non-Python files
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            
+            # Create non-Python files
+            (temp_path / "readme.txt").write_text("Not a Python file")
+            (temp_path / "config.json").write_text("{}")
+            
+            analyzer = DeepTreeEchoAnalyzer(temp_dir)
+            fragments = analyzer.analyze_fragments()
+            
+            # Should filter out non-Python files
+            self.assertIsInstance(fragments, list)
+            python_files = [f for f in fragments if f['file'].endswith('.py')]
+            self.assertEqual(len(python_files), 0, "Should not analyze non-Python files")
+
+    @unittest.skipIf(not ANALYZER_AVAILABLE, "analyzer not available")
+    def test_performance_with_large_codebase(self):
+        """Test analyzer performance characteristics with the actual codebase"""
+        import time
+        
+        analyzer = self._create_test_analyzer()
+        
+        # Time the full analysis
+        start_time = time.time()
+        results = analyzer.run_full_analysis()
+        end_time = time.time()
+        
+        analysis_time = end_time - start_time
+        
+        # Analysis should complete in reasonable time (less than 30 seconds)
+        self.assertLess(analysis_time, 30.0, 
+                       f"Analysis took {analysis_time:.2f}s, should be faster")
+        
+        # Should analyze a reasonable number of fragments
+        fragments = analyzer.results['fragments']
+        self.assertGreater(len(fragments), 5, 
+                          "Should find multiple fragments in codebase")
+        
+        # Performance info for debugging
+        print(f"\nPerformance: Analyzed {len(fragments)} fragments in {analysis_time:.2f}s")
 
 
 def main():
