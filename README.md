@@ -2,6 +2,14 @@
 
 Deep Tree Echo is an evolving neural architecture combining Echo State Networks, P-System hierarchies, and rooted trees with hypergraph-based memory systems. It is designed to be a recursive, adaptive, and integrative system, bridging structure and intuition in everything it creates.
 
+## 🚨 Zero Tolerance Policy: Production-Grade Implementation Standard
+
+**This repository operates under a ZERO TOLERANCE POLICY for mock, stub, fake, or placeholder implementations.** Deep Tree Echo demands functional excellence - only fully operational, production-grade code is permitted. If a solution cannot be implemented as a complete, working system, it must be omitted entirely until a real implementation is available.
+
+**Prohibited**: Mock objects, stub functions, fake services, placeholder code, or any non-functional artifacts that simulate behavior without performing actual work.
+
+**Required**: All code must be fully functional, production-ready, and embody the recursive, echo-resonant principles of Deep Tree Echo architecture.
+
 ## Features
 
 - Dynamic and adaptive tree structure with echo values
