@@ -248,17 +248,20 @@ def echo_validate(test_name: str, validation_func: callable) -> Tuple[bool, Dict
 
 
 def test_markdown_structure():
-    """Test that the enhanced Echoevo.md has proper structure"""
+    """Test that the enhanced Echoevo.md has proper structure with Echo-aware validation"""
+    echo_sys = get_echo_system()
+    
     echoevo_path = Path('Echoevo.md')
     
     if not echoevo_path.exists():
+        echo_sys.echo("Echoevo.md file not found - critical structural failure", "structural")
         print("❌ Echoevo.md file not found")
         return False
     
     with open(echoevo_path, 'r') as f:
         content = f.read()
     
-    # Test for required sections
+    # Test for required sections with Echo propagation
     required_sections = [
         '# 🌳 Echoevo: Neural-Symbolic Self-Evolving Workflow Architecture 🌳',
         '## Introduction',
@@ -276,41 +279,50 @@ def test_markdown_structure():
     for section in required_sections:
         if section not in content:
             missing_sections.append(section)
+            echo_sys.echo(f"Missing critical section: {section}", "structural")
     
     if missing_sections:
+        echo_sys.echo(f"Structural validation FAILED - {len(missing_sections)} missing sections", "cognitive")
         print(f"❌ Missing required sections: {missing_sections}")
         return False
     
+    echo_sys.echo("All required sections present - structural integrity confirmed", "cognitive")
     print("✅ All required sections present")
     return True
 
 
 def test_mermaid_diagram():
-    """Test that Mermaid diagram is present and properly formatted"""
+    """Test that Mermaid diagram is present and properly formatted with cognitive validation"""
+    echo_sys = get_echo_system()
+    
     echoevo_path = Path('Echoevo.md')
     
     with open(echoevo_path, 'r') as f:
         content = f.read()
     
-    # Check for Mermaid code blocks
+    # Check for Mermaid code blocks with Echo awareness
     mermaid_pattern = r'```mermaid\n(.*?)\n```'
     mermaid_blocks = re.findall(mermaid_pattern, content, re.DOTALL)
     
     if not mermaid_blocks:
+        echo_sys.echo("No Mermaid diagrams found - cognitive visualization missing", "semantic")
         print("❌ No Mermaid diagrams found")
         return False
     
-    # Validate basic Mermaid syntax
+    # Validate basic Mermaid syntax with Echo feedback
     for i, block in enumerate(mermaid_blocks):
         if 'graph TD' not in block and 'graph LR' not in block:
+            echo_sys.echo(f"Mermaid block {i+1} missing graph declaration", "semantic")
             print(f"❌ Mermaid block {i+1} missing graph declaration")
             return False
         
         # Check for basic node connections
         if '-->' not in block:
+            echo_sys.echo(f"Mermaid block {i+1} missing cognitive connections", "semantic")
             print(f"❌ Mermaid block {i+1} missing node connections")
             return False
     
+    echo_sys.echo(f"Found {len(mermaid_blocks)} cognitive flow diagrams - visualization validated", "cognitive")
     print(f"✅ Found {len(mermaid_blocks)} properly formatted Mermaid diagram(s)")
     return True
 
@@ -415,20 +427,138 @@ def test_safety_mechanisms():
     return True
 
 
-def test_experimental_framework():
-    """Test that experimental framework is properly enriched"""
-    echoevo_path = Path('Echoevo.md')
+def test_echo_integration():
+    """Test Echo system integration and cognitive architecture validation"""
+    echo_sys = get_echo_system()
     
+    # Test Echo system initialization
+    if not hasattr(echo_sys, 'validation_context'):
+        echo_sys.echo("Echo system missing validation context", "cognitive")
+        print("❌ Echo system validation context missing")
+        return False
+    
+    # Test Echo function responsiveness
+    test_message = "Echo integration validation test"
+    response = echo_sys.echo(test_message, "cognitive", echo_depth=3)
+    
+    if not response or 'original_message' not in response:
+        echo_sys.echo("Echo function not responding properly", "cognitive")  
+        print("❌ Echo function not responding")
+        return False
+    
+    if response['original_message'] != test_message:
+        echo_sys.echo("Echo message integrity compromised", "cognitive")
+        print("❌ Echo message integrity failed")
+        return False
+    
+    # Test validation history tracking
+    history_count = len(echo_sys.validation_context.validation_history)
+    if history_count == 0:
+        echo_sys.echo("No validation history being tracked", "cognitive")
+        print("❌ Validation history not tracking")
+        return False
+    
+    # Test cognitive metrics generation
+    if ECHO_INTEGRATION_AVAILABLE and echo_sys.echo_tree:
+        if not echo_sys.echo_tree.children:
+            echo_sys.echo("Echo tree not propagating validation nodes", "cognitive")
+            print("❌ Echo tree propagation failed")
+            return False
+        
+        print(f"✅ Echo tree has {len(echo_sys.echo_tree.children)} validation nodes")
+    
+    echo_sys.echo("Echo integration validation COMPLETE - system cognitively coherent", "cognitive")
+    print("✅ Echo system integration validated")
+    print(f"🧠 Validation history entries: {history_count}")
+    print(f"🔊 Echo integration mode: {'FULL' if ECHO_INTEGRATION_AVAILABLE else 'FALLBACK'}")
+    
+    return True
+
+
+def test_cognitive_architecture_coherence():
+    """Test cognitive architecture coherence and neural-symbolic integration"""
+    echo_sys = get_echo_system()
+    
+    echoevo_path = Path('Echoevo.md')
     with open(echoevo_path, 'r') as f:
         content = f.read()
     
-    # Check for experimental elements
+    # Test for cognitive architecture terminology with Echo validation
+    cognitive_terms = [
+        'cognitive',
+        'neural-symbolic', 
+        'recursive',
+        'self-evolving',
+        'distributed cognition',
+        'cognitive coherence',
+        'cognitive architecture',
+        'meta-cognitive'
+    ]
+    
+    term_coverage = {}
+    for term in cognitive_terms:
+        count = content.lower().count(term.lower())
+        term_coverage[term] = count
+        
+        if count > 0:
+            echo_sys.echo(f"Cognitive term '{term}' found {count} times", "semantic")
+        else:
+            echo_sys.echo(f"Missing cognitive term: {term}", "semantic")
+    
+    # Cognitive coherence threshold
+    total_mentions = sum(term_coverage.values())
+    coherence_threshold = 50  # Minimum mentions for cognitive coherence
+    
+    if total_mentions < coherence_threshold:
+        echo_sys.echo(f"Cognitive coherence BELOW threshold: {total_mentions}/{coherence_threshold}", "cognitive")
+        print(f"❌ Insufficient cognitive architecture terminology ({total_mentions} mentions)")
+        return False
+    
+    # Check for cognitive flow patterns
+    flow_patterns = [
+        'recursive self-improvement',
+        'cognitive assessment', 
+        'neural modifier',
+        'symbolic validator',
+        'cognitive enhancement',
+        'workflow evolution'
+    ]
+    
+    found_patterns = []
+    for pattern in flow_patterns:
+        if pattern.lower() in content.lower():
+            found_patterns.append(pattern)
+            echo_sys.echo(f"Cognitive flow pattern detected: {pattern}", "semantic")
+    
+    pattern_coverage = len(found_patterns) / len(flow_patterns)
+    if pattern_coverage < 0.6:  # At least 60% pattern coverage
+        echo_sys.echo(f"Cognitive flow pattern coverage insufficient: {pattern_coverage:.1%}", "cognitive")
+        print(f"❌ Cognitive flow patterns insufficient ({len(found_patterns)}/{len(flow_patterns)})")
+        return False
+    
+    echo_sys.echo(f"Cognitive architecture coherence VALIDATED - {total_mentions} terms, {len(found_patterns)} patterns", "cognitive")
+    print(f"✅ Cognitive architecture coherence validated")
+    print(f"🧠 Total cognitive terminology: {total_mentions} mentions")
+    print(f"🔄 Cognitive flow patterns: {len(found_patterns)}/{len(flow_patterns)}")
+    
+    return True
+
+
+def test_experimental_framework():
+    """Test that experimental framework is properly enriched with Echo-aware validation"""
+    echo_sys = get_echo_system()
+    
+    echoevo_path = Path('Echoevo.md')
+    with open(echoevo_path, 'r') as f:
+        content = f.read()
+    
+    # Check for experimental elements with Echo feedback
     experimental_elements = [
         'environment variables',
         'logging',
         'monitoring',
         'telemetry',
-        'metrics',
+        'metrics', 
         'experiments'
     ]
     
@@ -436,11 +566,17 @@ def test_experimental_framework():
     for element in experimental_elements:
         if element.lower() in content.lower():
             found_elements.append(element)
+            echo_sys.echo(f"Experimental element found: {element}", "semantic")
+        else:
+            echo_sys.echo(f"Missing experimental element: {element}", "semantic")
     
-    if len(found_elements) < len(experimental_elements) * 0.8:  # At least 80% of elements
+    coverage_ratio = len(found_elements) / len(experimental_elements)
+    if coverage_ratio < 0.8:  # At least 80% of elements
+        echo_sys.echo(f"Experimental framework coverage insufficient: {coverage_ratio:.1%}", "cognitive")
         print(f"❌ Insufficient experimental framework. Found: {found_elements}")
         return False
     
+    echo_sys.echo(f"Experimental framework validation COMPLETE - {len(found_elements)} elements confirmed", "cognitive")
     print(f"✅ Experimental framework properly enriched ({len(found_elements)}/{len(experimental_elements)} elements)")
     return True
 
@@ -467,7 +603,9 @@ def main():
         ("Code Blocks", test_code_blocks),
         ("Neural-Symbolic Language", test_neural_symbolic_language),
         ("Safety Mechanisms", test_safety_mechanisms),
-        ("Experimental Framework", test_experimental_framework)
+        ("Experimental Framework", test_experimental_framework),
+        ("Echo System Integration", test_echo_integration),
+        ("Cognitive Architecture Coherence", test_cognitive_architecture_coherence)
     ]
     
     passed_tests = 0
