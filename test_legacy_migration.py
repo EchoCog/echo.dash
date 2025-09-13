@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
 """
-Test for legacy file cleanup validation
+Test for legacy file archival validation
 
-This validates that deprecated legacy files have been completely removed
-and are no longer present anywhere in the repository.
+This validates that deprecated legacy files have been properly moved
+to the archived directory structure for preservation.
 """
 
 import os
 from pathlib import Path
 
 
-def test_legacy_files_removed():
-    """Test that legacy files have been completely removed"""
-    print("🧪 Testing legacy file cleanup...")
+def test_legacy_files_archived():
+    """Test that legacy files have been properly archived"""
+    print("🧪 Testing legacy file archival...")
     
     repo_root = Path(__file__).parent
     archive_legacy = repo_root / "archive" / "legacy"
+    archive_archived = repo_root / "archive" / "archived" / "legacy_deep_tree_echo"
     
-    # Legacy files that should be completely removed
+    # Legacy files that should be archived
     legacy_files = [
         "deep_tree_echo-v1.py", 
         "deep_tree_echo-v2.py"
@@ -29,13 +30,19 @@ def test_legacy_files_removed():
         assert not root_file.exists(), f"Legacy file {file} should not exist in root directory"
         print(f"  ✅ {file} correctly removed from root")
     
-    # Verify files are NOT in archive/legacy directory (completely cleaned up)
+    # Verify files are NOT in archive/legacy directory (moved to archived)
     for file in legacy_files:
-        archived_file = archive_legacy / file
-        assert not archived_file.exists(), f"Legacy file {file} should be completely removed"
-        print(f"  ✅ {file} completely removed (not even archived)")
+        legacy_file = archive_legacy / file
+        assert not legacy_file.exists(), f"Legacy file {file} should be moved from archive/legacy/"
+        print(f"  ✅ {file} correctly moved from archive/legacy/")
+        
+    # Verify files ARE in archive/archived/legacy_deep_tree_echo directory
+    for file in legacy_files:
+        archived_file = archive_archived / file
+        assert archived_file.exists(), f"Legacy file {file} should exist in archive/archived/legacy_deep_tree_echo/"
+        print(f"  ✅ {file} correctly archived in archive/archived/legacy_deep_tree_echo/")
     
-    print("  ✅ All legacy file cleanup tests passed")
+    print("  ✅ All legacy file archival tests passed")
 
 
 def test_archive_structure():
@@ -88,21 +95,22 @@ def test_analyzer_shows_resolution():
 
 
 def run_all_tests():
-    """Run all legacy cleanup tests"""
-    print("🚀 Starting Legacy Code Cleanup Validation Tests")
+    """Run all legacy archival tests"""
+    print("🚀 Starting Legacy Code Archival Validation Tests")
     print("=" * 50)
     
     try:
-        test_legacy_files_removed()
+        test_legacy_files_archived()
         test_archive_structure()
         test_analyzer_shows_resolution()
         
         print("\n" + "=" * 50)
-        print("✅ All legacy cleanup tests passed!")
-        print("\n🎯 Legacy code cleanup validation successful:")
-        print("  - Legacy deep_tree_echo files completely removed")
+        print("✅ All legacy archival tests passed!")
+        print("\n🎯 Legacy code archival validation successful:")
+        print("  - Legacy deep_tree_echo files properly archived to archive/archived/legacy_deep_tree_echo/")
         print("  - Root directory cleaned of deprecated versions")
         print("  - Archive/legacy directory cleaned of deep_tree_echo files")
+        print("  - Archive/archived directory properly structured with README")
         print("  - Analyzer shows legacy code retention as resolved")
         
         return True

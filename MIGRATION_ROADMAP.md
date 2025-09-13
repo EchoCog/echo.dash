@@ -12,15 +12,16 @@ Systematic plan for migrating fragmented Deep Tree Echo implementations into a u
 
 #### 1.1 Legacy Version Retirement ✅ **COMPLETED**
 - **Target**: `deep_tree_echo-v1.py`, `deep_tree_echo-v2.py`
-- **Action**: ✅ Complete removal of legacy files (superseded by main implementation)  
+- **Action**: ✅ Proper archival of legacy files to preserve historical implementations  
 - **Rationale**: Identical files (503 lines each), superseded by current implementation (1161 lines)
 - **Risk**: Low (deprecated, not actively used)
-- **Status**: ✅ Legacy files completely removed, references updated
+- **Status**: ✅ Legacy files archived to `archive/archived/legacy_deep_tree_echo/`, references updated
 - **Migration Steps Completed**:
   ```bash
-  ✅ mkdir -p archive/legacy
-  ✅ rm archive/legacy/deep_tree_echo-v1.py
-  ✅ rm archive/legacy/deep_tree_echo-v2.py
+  ✅ mkdir -p archive/archived/legacy_deep_tree_echo
+  ✅ mv archive/legacy/deep_tree_echo-v1.py archive/archived/legacy_deep_tree_echo/
+  ✅ mv archive/legacy/deep_tree_echo-v2.py archive/archived/legacy_deep_tree_echo/
+  ✅ Created archive/archived/README.md explaining archived files
   ✅ Updated references in analyzer and tests
   ```
 
@@ -128,8 +129,8 @@ Systematic plan for migrating fragmented Deep Tree Echo implementations into a u
 #### Before Migration
 ```
 ├── deep_tree_echo.py (1161 lines - current implementation)
-├── [REMOVED] deep_tree_echo-v1.py (legacy files removed)
-├── [REMOVED] deep_tree_echo-v2.py (legacy files removed)
+├── [ARCHIVED] deep_tree_echo-v1.py (moved to archive/archived/legacy_deep_tree_echo/)
+├── [ARCHIVED] deep_tree_echo-v2.py (moved to archive/archived/legacy_deep_tree_echo/)
 ├── browser_interface.py (independent)
 ├── echo9ml.py (parallel system)
 ├── echoself_introspection.py (separate)

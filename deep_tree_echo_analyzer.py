@@ -143,10 +143,10 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
             },
             {
                 'gap': 'Legacy Code Retention',
-                'description': 'Legacy versions have been successfully removed from archive/legacy/',
+                'description': 'Legacy versions have been archived to archive/archived/legacy_deep_tree_echo/',
                 'priority': 'resolved',
-                'files': ['Echoevo.md.backup'],  # Only remaining legacy file
-                'evidence': 'Legacy deep_tree_echo v1/v2 files successfully removed'
+                'files': ['archive/archived/legacy_deep_tree_echo/deep_tree_echo-v1.py', 'archive/archived/legacy_deep_tree_echo/deep_tree_echo-v2.py', 'Echoevo.md.backup'],
+                'evidence': 'Legacy deep_tree_echo v1/v2 files successfully archived for historical preservation'
             },
             {
                 'gap': 'Incomplete P-System',
@@ -176,11 +176,11 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
         tasks = [
             {
                 'task': 'Archive Legacy Versions',
-                'description': 'Legacy deep_tree_echo v1/v2 files successfully removed',
+                'description': 'Legacy deep_tree_echo v1/v2 files successfully archived',
                 'type': 'completed',
-                'files': ['Echoevo.md.backup'],  # Only remaining legacy file
+                'files': ['archive/archived/legacy_deep_tree_echo/deep_tree_echo-v1.py', 'archive/archived/legacy_deep_tree_echo/deep_tree_echo-v2.py', 'Echoevo.md.backup'],
                 'estimated_effort': 'completed',
-                'implementation': 'Legacy deep_tree_echo files have been removed from archive/legacy/'
+                'implementation': 'Legacy deep_tree_echo files moved to archive/archived/legacy_deep_tree_echo/ for historical preservation'
             },
             {
                 'task': 'Unify Memory Systems', 
@@ -243,13 +243,14 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
         high_impact_low_effort = [
             {
                 'action': 'Archive Legacy Files',
-                'rationale': 'Completed - legacy deep_tree_echo files removed',
+                'rationale': 'Completed - legacy deep_tree_echo files archived for preservation',
                 'steps': [
-                    '✓ Archive/legacy/ directory already exists',
-                    '✓ Removed deep_tree_echo-v1.py from archive/legacy/',
-                    '✓ Removed deep_tree_echo-v2.py from archive/legacy/', 
+                    '✓ Created archive/archived/legacy_deep_tree_echo/ directory',
+                    '✓ Moved deep_tree_echo-v1.py to archive/archived/legacy_deep_tree_echo/',
+                    '✓ Moved deep_tree_echo-v2.py to archive/archived/legacy_deep_tree_echo/', 
+                    '✓ Created README.md explaining archived files',
                     '☐ Move remaining backup files to archive/',
-                    '☐ Update documentation to reflect cleanup'
+                    '☐ Update documentation to reflect archival structure'
                 ]
             },
             {

@@ -4,9 +4,9 @@ This directory contains legacy and backup files that were part of the Deep Tree 
 
 ## Contents
 
-### Legacy Versions ✅ **REMOVED**
-- `legacy/deep_tree_echo-v1.py` - ✅ **Removed** - Early implementation superseded by current version
-- `legacy/deep_tree_echo-v2.py` - ✅ **Removed** - Second iteration superseded by current version  
+### Legacy Versions ✅ **ARCHIVED**
+- `archived/legacy_deep_tree_echo/deep_tree_echo-v1.py` - ✅ **Archived** - Early implementation preserved for historical reference
+- `archived/legacy_deep_tree_echo/deep_tree_echo-v2.py` - ✅ **Archived** - Second iteration preserved for historical reference  
 
 ### Backup Files
 - `Echoevo.md.backup` - Backup of evolution documentation
@@ -28,11 +28,12 @@ For current implementation, see the main directory files:
 
 ## Migration Notes
 
-Legacy deep_tree_echo files were completely removed as part of the Deep Tree Echo consolidation effort to:
+Legacy deep_tree_echo files were archived to `archive/archived/legacy_deep_tree_echo/` as part of the Deep Tree Echo consolidation effort to:
 - Reduce code fragmentation
 - Improve maintainability  
 - Clarify which implementation is current
 - Eliminate confusion between versions
+- Preserve historical implementations for reference
 
-**Legacy Cleanup Completed:** December 21, 2024  
+**Legacy Archival Completed:** December 21, 2024  
 **Migration Task:** Legacy Code Retention Resolution (✅ completed)
