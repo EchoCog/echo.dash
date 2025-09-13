@@ -143,10 +143,10 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
             },
             {
                 'gap': 'Legacy Code Retention',
-                'description': 'Deprecated versions (v1, v2) still present causing confusion',
-                'priority': 'medium',
-                'files': ['deep_tree_echo-v1.py', 'deep_tree_echo-v2.py', 'Echoevo.md.backup'],
-                'evidence': 'Multiple version files coexist without clear migration path'
+                'description': 'Legacy versions have been archived to archive/archived/legacy_deep_tree_echo/',
+                'priority': 'resolved',
+                'files': ['archive/archived/legacy_deep_tree_echo/deep_tree_echo-v1.py', 'archive/archived/legacy_deep_tree_echo/deep_tree_echo-v2.py', 'Echoevo.md.backup'],
+                'evidence': 'Legacy deep_tree_echo v1/v2 files successfully archived for historical preservation'
             },
             {
                 'gap': 'Incomplete P-System',
@@ -176,11 +176,11 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
         tasks = [
             {
                 'task': 'Archive Legacy Versions',
-                'description': 'Move v1/v2 implementations to archive directory to reduce confusion',
-                'type': 'cleanup',
-                'files': ['deep_tree_echo-v1.py', 'deep_tree_echo-v2.py', 'Echoevo.md.backup'],
-                'estimated_effort': 'small',
-                'implementation': 'Create archive/ directory and move legacy files'
+                'description': 'Legacy deep_tree_echo v1/v2 files successfully archived',
+                'type': 'completed',
+                'files': ['archive/archived/legacy_deep_tree_echo/deep_tree_echo-v1.py', 'archive/archived/legacy_deep_tree_echo/deep_tree_echo-v2.py', 'Echoevo.md.backup'],
+                'estimated_effort': 'completed',
+                'implementation': 'Legacy deep_tree_echo files moved to archive/archived/legacy_deep_tree_echo/ for historical preservation'
             },
             {
                 'task': 'Unify Memory Systems', 
@@ -243,13 +243,14 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
         high_impact_low_effort = [
             {
                 'action': 'Archive Legacy Files',
-                'rationale': 'Quick win to reduce code confusion',
+                'rationale': 'Completed - legacy deep_tree_echo files archived for preservation',
                 'steps': [
-                    'Create archive/legacy/ directory',
-                    'Move deep_tree_echo-v1.py to archive/legacy/',
-                    'Move deep_tree_echo-v2.py to archive/legacy/', 
-                    'Move backup files to archive/',
-                    'Update documentation to reflect archive structure'
+                    '✓ Created archive/archived/legacy_deep_tree_echo/ directory',
+                    '✓ Moved deep_tree_echo-v1.py to archive/archived/legacy_deep_tree_echo/',
+                    '✓ Moved deep_tree_echo-v2.py to archive/archived/legacy_deep_tree_echo/', 
+                    '✓ Created README.md explaining archived files',
+                    '☐ Move remaining backup files to archive/',
+                    '☐ Update documentation to reflect archival structure'
                 ]
             },
             {
