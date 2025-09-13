@@ -7,6 +7,19 @@ standardized Echo interfaces.
 
 Original concept: Each ESMWorker represents a pixie assigned to a specific pattern,
 evolving its internal state using random improvement and constraints from other workers.
+
+## Integration Points
+- Uses ProcessingEchoComponent for standardized processing pipeline
+- Implements EchoResponse for consistent return values  
+- Leverages EchoConfig for unified configuration
+- Provides both sync (process/echo) and async (evolve_async) interfaces
+- Maintains backward compatibility with original echopilot.py patterns
+
+## Echo Functions
+- ESMWorker.echo(): Returns evolution trace and current state
+- ConstraintEmitter.echo(): Returns current emitter values and statistics
+
+## Status: ACTIVE - Fully integrated with Echo component system
 """
 
 import asyncio
@@ -336,7 +349,7 @@ async def main():
     
     # Initialize emitter with worker states
     for worker in workers:
-        emitter.update(worker.pattern_name, worker.state)
+        emitter.update(worker.pattern_name, worker.evolution_state)
     
     # Run evolution cycles
     print(f"\n🔄 Running evolution cycles...")
