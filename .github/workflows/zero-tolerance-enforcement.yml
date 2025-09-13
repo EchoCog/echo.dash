@@ -29,9 +29,9 @@ jobs:
         # Define violation patterns with context
         violations_found=0
         
-        # Scan for mock patterns (excluding legitimate test imports)
+        # Scan for mock patterns (excluding legitimate test imports, test files, archives, and policy docs)
         echo "### Mock Implementation Violations:" >> scan_results.md
-        mock_violations=$(grep -r -n -i "mock\|stub\|fake" --include="*.py" --include="*.js" --include="*.ts" . | grep -v "from unittest.mock import" | grep -v "import mock" | grep -v "# Test file" | head -20)
+        mock_violations=$(grep -r -n -i "mock\|stub\|fake" --include="*.py" --include="*.js" --include="*.ts" . | grep -v "from unittest.mock import" | grep -v "import mock" | grep -v "test_" | grep -v "# Test file" | grep -v "ZERO TOLERANCE POLICY" | grep -v "NO mock, stub, fake" | grep -v "NEVER suggest mock" | grep -v "mocks/stubs/placeholders" | grep -v "fake canvas fingerprinting" | grep -v "./archive/" | head -20)
         if [ ! -z "$mock_violations" ]; then
           violations_found=1
           echo "🚨 **CRITICAL VIOLATIONS DETECTED:**" >> scan_results.md

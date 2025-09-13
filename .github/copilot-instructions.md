@@ -39,8 +39,9 @@ This repository operates under a **ZERO TOLERANCE POLICY** for mock, stub, fake,
 - **Zero placeholders**: No temporary, mock, or stub code is permitted
 
 #### ENFORCEMENT:
-- Automated scanning detects and flags any mock/fake implementations
-- GitHub Actions will create emergency issues for any violations found
+- Automated scanning detects and flags any mock/fake implementations in production code
+- Testing infrastructure may use appropriate testing patterns (unittest.mock) but only for testing purposes
+- GitHub Actions will create emergency issues for any violations found in production code
 - Code review process must verify zero tolerance policy compliance
 - All AI-generated code must be production-ready, not placeholder code
 

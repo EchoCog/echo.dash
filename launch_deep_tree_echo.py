@@ -191,13 +191,9 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
             
             # Create config from arguments or use provided config
             if args_dict:
-                # Create mock args object from dictionary
-                class MockArgs:
-                    def __init__(self, args_dict):
-                        for key, value in args_dict.items():
-                            setattr(self, key, value)
-                
-                args = MockArgs(args_dict)
+                # Create real arguments object from dictionary using argparse Namespace
+                import argparse
+                args = argparse.Namespace(**args_dict)
                 config = create_config_from_args(config_name, args)
             else:
                 # Use default configuration
@@ -248,12 +244,9 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
         """Create configuration from arguments"""
         try:
             if args_dict:
-                class MockArgs:
-                    def __init__(self, args_dict):
-                        for key, value in args_dict.items():
-                            setattr(self, key, value)
-                
-                args = MockArgs(args_dict)
+                # Create real arguments object from dictionary using argparse Namespace
+                import argparse
+                args = argparse.Namespace(**args_dict)
             else:
                 parser = create_argument_parser(config_name)
                 args = parser.parse_args([])
