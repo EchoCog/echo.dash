@@ -1,0 +1,182 @@
+{
+  "cycles": [
+    {
+      "timestamp": "2025-09-13T17:29:11.539496",
+      "duration": 0.9534420967102051,
+      "agents": {
+        "AsyncAgent": 0.812886814706498
+      },
+      "resource_metrics": {
+        "cpu_usage": 0.0,
+        "memory_usage": 0.0,
+        "disk_usage": 0.0
+      }
+    }
+  ],
+  "agents": {
+    "TestAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.577508",
+          "domain": "Testing Domain",
+          "state": 0.8,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.577503",
+      "domain": "Testing Domain",
+      "state": 0.8,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "LegacyAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.579237",
+          "domain": "Legacy Testing",
+          "state": 0.0,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.579232",
+      "domain": "Legacy Testing",
+      "state": 0.0,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "UnifiedAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.580838",
+          "domain": "Unified Testing",
+          "state": 0.0,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.580831",
+      "domain": "Unified Testing",
+      "state": 0.0,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "CognitiveAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.582417",
+          "domain": "Cognitive Architecture",
+          "state": 0.2256754987872911,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.582412",
+      "domain": "Cognitive Architecture",
+      "state": 0.2256754987872911,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "MemoryAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.582756",
+          "domain": "Memory Management",
+          "state": 0.44317020539127006,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.582752",
+      "domain": "Memory Management",
+      "state": 0.44317020539127006,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "SensoryAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.583114",
+          "domain": "Sensory Processing",
+          "state": 0.6094510429157067,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.583109",
+      "domain": "Sensory Processing",
+      "state": 0.6094510429157067,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "IntegrationAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.583453",
+          "domain": "System Integration",
+          "state": 0.7623844210215742,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.583449",
+      "domain": "System Integration",
+      "state": 0.7623844210215742,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    }
+  },
+  "system_metrics": [
+    {
+      "agent_echo": "TestAgent",
+      "resonance": 0.66,
+      "echo_value": 0.9,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:29:10.577678"
+    },
+    {
+      "agent_echo": "TestAgent",
+      "resonance": 0.16000000000000003,
+      "echo_value": 0.9,
+      "data_type": "dict",
+      "timestamp": "2025-09-13T17:29:10.578138"
+    },
+    {
+      "agent_echo": "TestAgent",
+      "resonance": 0.16000000000000003,
+      "echo_value": 0.9,
+      "data_type": "list",
+      "timestamp": "2025-09-13T17:29:10.578394"
+    },
+    {
+      "agent_echo": "TestAgent",
+      "resonance": 0.16000000000000003,
+      "echo_value": 0.9,
+      "data_type": "int",
+      "timestamp": "2025-09-13T17:29:10.578667"
+    },
+    {
+      "agent_echo": "LegacyAgent",
+      "resonance": 0.0,
+      "echo_value": 0.5,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:29:10.579479"
+    },
+    {
+      "agent_echo": "UnifiedAgent",
+      "resonance": 0.5,
+      "echo_value": 0.7,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:29:10.581185"
+    },
+    {
+      "agent_echo": "IntegrationAgent",
+      "resonance": 0.15247688420431485,
+      "echo_value": 0.6,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:29:10.584825"
+    }
+  ],
+  "last_updated": "2025-09-13T17:29:11.539516"
+}
