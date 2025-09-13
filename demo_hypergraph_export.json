@@ -1,0 +1,160 @@
+{
+  "nodes": [
+    {
+      "id": "component_memory_systems",
+      "label": "memory_systems",
+      "type": "system_component",
+      "salience_score": 0.3,
+      "depth_level": 1,
+      "patterns": [
+        "associative_recall",
+        "hierarchical_storage",
+        "temporal_clustering"
+      ]
+    },
+    {
+      "id": "pattern_associative_recall_0",
+      "label": "associative_recall",
+      "type": "pattern",
+      "salience_score": 0.3,
+      "component_source": "memory_systems"
+    },
+    {
+      "id": "pattern_hierarchical_storage_1",
+      "label": "hierarchical_storage",
+      "type": "pattern",
+      "salience_score": 0.35,
+      "component_source": "memory_systems"
+    },
+    {
+      "id": "pattern_temporal_clustering_2",
+      "label": "temporal_clustering",
+      "type": "pattern",
+      "salience_score": 0.4,
+      "component_source": "memory_systems"
+    },
+    {
+      "id": "component_attention_mechanisms",
+      "label": "attention_mechanisms",
+      "type": "system_component",
+      "salience_score": 0.5,
+      "analyzed": false
+    },
+    {
+      "id": "component_goal_generators",
+      "label": "goal_generators",
+      "type": "system_component",
+      "salience_score": 0.5,
+      "analyzed": false
+    },
+    {
+      "id": "component_pattern_recognizers",
+      "label": "pattern_recognizers",
+      "type": "system_component",
+      "salience_score": 0.5,
+      "analyzed": false
+    },
+    {
+      "id": "component_recursive_analyzers",
+      "label": "recursive_analyzers",
+      "type": "system_component",
+      "salience_score": 0.5,
+      "analyzed": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "component_memory_systems",
+      "target": "pattern_associative_recall_0",
+      "type": "contains_pattern",
+      "strength": 0.75
+    },
+    {
+      "source": "component_memory_systems",
+      "target": "pattern_hierarchical_storage_1",
+      "type": "contains_pattern",
+      "strength": 0.75
+    },
+    {
+      "source": "component_memory_systems",
+      "target": "pattern_temporal_clustering_2",
+      "type": "contains_pattern",
+      "strength": 0.75
+    },
+    {
+      "source": "component_memory_systems",
+      "target": "component_attention_mechanisms",
+      "type": "component_interaction",
+      "strength": 0.8
+    },
+    {
+      "source": "component_memory_systems",
+      "target": "component_goal_generators",
+      "type": "component_interaction",
+      "strength": 0.4
+    },
+    {
+      "source": "component_memory_systems",
+      "target": "component_pattern_recognizers",
+      "type": "component_interaction",
+      "strength": 0.7
+    },
+    {
+      "source": "component_memory_systems",
+      "target": "component_recursive_analyzers",
+      "type": "component_interaction",
+      "strength": 0.6
+    },
+    {
+      "source": "component_attention_mechanisms",
+      "target": "component_goal_generators",
+      "type": "component_interaction",
+      "strength": 0.6
+    },
+    {
+      "source": "component_attention_mechanisms",
+      "target": "component_pattern_recognizers",
+      "type": "component_interaction",
+      "strength": 0.7
+    },
+    {
+      "source": "component_attention_mechanisms",
+      "target": "component_recursive_analyzers",
+      "type": "component_interaction",
+      "strength": 0.5
+    },
+    {
+      "source": "component_goal_generators",
+      "target": "component_pattern_recognizers",
+      "type": "component_interaction",
+      "strength": 0.4
+    },
+    {
+      "source": "component_goal_generators",
+      "target": "component_recursive_analyzers",
+      "type": "component_interaction",
+      "strength": 0.5
+    },
+    {
+      "source": "component_pattern_recognizers",
+      "target": "component_recursive_analyzers",
+      "type": "component_interaction",
+      "strength": 0.9
+    }
+  ],
+  "attention_history": [
+    {
+      "cycle": 1,
+      "focus": "memory_systems",
+      "attention_allocated": 0.3,
+      "meta_attention": 0.15,
+      "timestamp": "2025-09-13T18:47:39.686692"
+    }
+  ],
+  "metadata": {
+    "export_timestamp": "2025-09-13T18:47:39.686919",
+    "introspection_cycles": 1,
+    "total_memories": 1,
+    "implementation": "fallback_real"
+  }
+}
