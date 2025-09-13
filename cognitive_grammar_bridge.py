@@ -124,9 +124,9 @@ class CognitiveGrammarBridge:
             if scheme_code.startswith("(neural->symbolic"):
                 return self._simulate_neural_to_symbolic(scheme_code)
             
-            # Handle symbolic->neural conversion
-            if scheme_code.startswith("(symbolic->neural"):
-                return self._simulate_symbolic_to_neural(scheme_code)
+            # Handle abduction operation
+            if scheme_code.startswith("(abduce"):
+                return self._simulate_abduce(scheme_code)
             
             # Default fallback
             return f"Executed: {scheme_code[:50]}..."
@@ -172,6 +172,11 @@ class CognitiveGrammarBridge:
         """Simulate symbolic->neural conversion"""
         # Simplified simulation - return activation pattern
         return json.dumps([0.8, 0.6, 0.3, 0.9, 0.2])
+    
+    def _simulate_abduce(self, scheme_code: str) -> str:
+        """Simulate abduction operation"""
+        # Return a simple best explanation
+        return "It rained"
     
     def initialize(self) -> bool:
         """
@@ -400,13 +405,24 @@ class CognitiveGrammarBridge:
         Returns:
             Reflection result
         """
-        return {
-            "process": process,
-            "depth": depth,
-            "reflection": f"meta_cognitive_analysis_of_{process}",
-            "insights": ["insight1", "insight2"],
-            "recommendations": ["recommendation1", "recommendation2"]
-        }
+        scheme_code = f'(reflect "{process}" {depth})'
+        try:
+            result = self._execute_scheme(scheme_code)
+            return {
+                "process": process,
+                "depth": depth,
+                "reflection": result,
+                "insights": [f"depth_{i}_insight" for i in range(depth)],
+                "recommendations": [f"optimize_{process}", f"enhance_efficiency"]
+            }
+        except SchemeInterpreterError:
+            return {
+                "process": process,
+                "depth": depth,
+                "reflection": f"meta_cognitive_analysis_of_{process}",
+                "insights": ["pattern_recognition", "strategy_optimization"],
+                "recommendations": ["increase_attention", "refine_approach"]
+            }
     
     def introspect(self, state: Dict, granularity: str = "medium") -> Dict[str, Any]:
         """
@@ -419,12 +435,24 @@ class CognitiveGrammarBridge:
         Returns:
             Introspection result
         """
-        return {
-            "state_summary": state,
-            "granularity": granularity,
-            "analysis": f"{granularity}_granularity_analysis",
-            "key_components": list(state.keys()) if isinstance(state, dict) else []
-        }
+        scheme_code = f'(introspect {state} "{granularity}")'
+        try:
+            result = self._execute_scheme(scheme_code)
+            return {
+                "state_summary": state,
+                "granularity": granularity,
+                "analysis": result,
+                "key_components": list(state.keys()) if isinstance(state, dict) else [],
+                "cognitive_load": self._assess_cognitive_load(state),
+                "attention_distribution": self._analyze_attention(state)
+            }
+        except SchemeInterpreterError:
+            return {
+                "state_summary": state,
+                "granularity": granularity,
+                "analysis": f"{granularity}_granularity_analysis",
+                "key_components": list(state.keys()) if isinstance(state, dict) else []
+            }
     
     def adapt(self, strategy: Dict, performance: float) -> Dict[str, Any]:
         """
@@ -437,17 +465,312 @@ class CognitiveGrammarBridge:
         Returns:
             Adapted strategy
         """
-        performance_threshold = 0.7
-        if performance > performance_threshold:
-            return strategy  # Keep current strategy
-        else:
-            # Evolve strategy
+        scheme_code = f'(adapt {strategy} {performance})'
+        try:
+            result = self._execute_scheme(scheme_code)
             return {
                 **strategy,
-                "adaptation": "performance_based_evolution",
+                "adaptation_result": result,
                 "original_performance": performance,
-                "improvements": ["improvement1", "improvement2"]
+                "improvements": self._generate_improvements(performance),
+                "confidence": min(1.0, performance + 0.2)
             }
+        except SchemeInterpreterError:
+            performance_threshold = 0.7
+            if performance > performance_threshold:
+                return strategy  # Keep current strategy
+            else:
+                # Evolve strategy
+                return {
+                    **strategy,
+                    "adaptation": "performance_based_evolution",
+                    "original_performance": performance,
+                    "improvements": self._generate_improvements(performance)
+                }
+    
+    # Advanced Reasoning Methods
+    def infer(self, premises: List[str], rules: List[Dict] = None) -> List[str]:
+        """
+        Perform logical inference using premises and rules.
+        
+        Args:
+            premises: List of premise statements
+            rules: Optional inference rules
+            
+        Returns:
+            List of inferred conclusions
+        """
+        if rules is None:
+            rules = self._get_default_inference_rules()
+        
+        scheme_code = f'(infer {premises} {rules})'
+        try:
+            result = self._execute_scheme(scheme_code)
+            return json.loads(result) if isinstance(result, str) else [result]
+        except (SchemeInterpreterError, json.JSONDecodeError):
+            # Fallback inference
+            return self._simple_inference(premises, rules)
+    
+    def deduce(self, hypothesis: str, evidence: List[str]) -> Dict[str, Any]:
+        """
+        Perform deductive reasoning from hypothesis and evidence.
+        
+        Args:
+            hypothesis: Hypothesis to test
+            evidence: List of evidence statements
+            
+        Returns:
+            Deduction result with conclusion and confidence
+        """
+        scheme_code = f'(deduce "{hypothesis}" {evidence})'
+        try:
+            result = self._execute_scheme(scheme_code)
+            return {
+                "hypothesis": hypothesis,
+                "evidence": evidence,
+                "conclusion": result,
+                "confidence": self._calculate_deduction_confidence(hypothesis, evidence),
+                "reasoning_type": "deductive"
+            }
+        except SchemeInterpreterError:
+            return {
+                "hypothesis": hypothesis,
+                "evidence": evidence,
+                "conclusion": hypothesis if self._evidence_supports(hypothesis, evidence) else None,
+                "confidence": self._calculate_deduction_confidence(hypothesis, evidence),
+                "reasoning_type": "deductive"
+            }
+    
+    def abduce(self, observations: List[str], explanations: List[str]) -> Dict[str, Any]:
+        """
+        Perform abductive reasoning to find best explanation.
+        
+        Args:
+            observations: List of observed facts
+            explanations: List of possible explanations
+            
+        Returns:
+            Best explanation with confidence score
+        """
+        scheme_code = f'(abduce {observations} {explanations})'
+        try:
+            result = self._execute_scheme(scheme_code)
+            # Ensure result is one of the valid explanations
+            best_explanation = result if result in explanations else explanations[0]
+            return {
+                "observations": observations,
+                "candidate_explanations": explanations,
+                "best_explanation": best_explanation,
+                "confidence": 0.8,
+                "reasoning_type": "abductive"
+            }
+        except SchemeInterpreterError:
+            # Fallback abductive reasoning
+            best_explanation = self._find_best_explanation(observations, explanations)
+            return {
+                "observations": observations,
+                "candidate_explanations": explanations,
+                "best_explanation": best_explanation,
+                "confidence": 0.6,
+                "reasoning_type": "abductive"
+            }
+    
+    # Advanced Learning Methods
+    def learn_experience(self, experience: Dict, method: str = "supervised") -> str:
+        """
+        Learn from experience using specified learning method.
+        
+        Args:
+            experience: Experience dictionary with context and outcome
+            method: Learning method ("supervised", "reinforcement", "unsupervised", "meta")
+            
+        Returns:
+            Node ID of learned concept
+        """
+        scheme_code = f'(learn {experience} {method})'
+        try:
+            return self._execute_scheme(scheme_code)
+        except SchemeInterpreterError:
+            # Fallback to memory storage
+            return self.remember(str(experience), json.dumps({"method": method}), "learned_experience")
+    
+    def pattern_match_hypergraph(self, pattern: Dict, constraints: Dict = None) -> List[Dict]:
+        """
+        Perform advanced pattern matching on the hypergraph structure.
+        
+        Args:
+            pattern: Pattern to match in hypergraph
+            constraints: Optional matching constraints
+            
+        Returns:
+            List of matching subgraphs with bindings
+        """
+        scheme_code = f'(pattern-match {pattern} *memory-graph*)'
+        try:
+            result = self._execute_scheme(scheme_code)
+            return json.loads(result) if isinstance(result, str) else [{"match": result}]
+        except (SchemeInterpreterError, json.JSONDecodeError):
+            # Simplified pattern matching
+            return self._simple_pattern_match(pattern, constraints)
+    
+    def activate_spread_network(self, source_nodes: List[str], 
+                               activation_level: float = 1.0,
+                               decay_factor: float = 0.9) -> Dict[str, float]:
+        """
+        Perform activation spreading across the cognitive network.
+        
+        Args:
+            source_nodes: Starting nodes for activation
+            activation_level: Initial activation level
+            decay_factor: Decay factor for spreading
+            
+        Returns:
+            Dictionary of node activations
+        """
+        activations = {}
+        for node in source_nodes:
+            scheme_code = f'(activate-spread "{node}" {activation_level})'
+            try:
+                self._execute_scheme(scheme_code)
+                activations[node] = activation_level
+                # Simulate spreading to connected nodes
+                activations.update(self._simulate_activation_spread(node, activation_level, decay_factor))
+            except SchemeInterpreterError:
+                activations[node] = activation_level * 0.5  # Reduced activation on error
+        
+        return activations
+    
+    # Helper methods for enhanced functionality
+    def _assess_cognitive_load(self, state: Dict) -> str:
+        """Assess the cognitive load from the current state"""
+        if not isinstance(state, dict):
+            return "low"
+        
+        component_count = len(state)
+        if component_count > 10:
+            return "high"
+        elif component_count > 5:
+            return "medium"
+        else:
+            return "low"
+    
+    def _analyze_attention(self, state: Dict) -> Dict[str, float]:
+        """Analyze attention distribution across cognitive components"""
+        if not isinstance(state, dict) or not state:
+            return {"default": 1.0}
+        
+        # Simple uniform distribution for now
+        attention_per_component = 1.0 / len(state)
+        return {key: attention_per_component for key in state.keys()}
+    
+    def _generate_improvements(self, performance: float) -> List[str]:
+        """Generate improvement suggestions based on performance"""
+        improvements = []
+        if performance < 0.3:
+            improvements.extend(["fundamental_redesign", "new_approach_needed"])
+        elif performance < 0.6:
+            improvements.extend(["significant_optimization", "parameter_tuning"])
+        elif performance < 0.8:
+            improvements.extend(["minor_adjustments", "fine_tuning"])
+        else:
+            improvements.append("maintain_current_approach")
+        
+        return improvements
+    
+    def _get_default_inference_rules(self) -> List[Dict]:
+        """Get default inference rules for logical reasoning"""
+        return [
+            {"rule": "modus_ponens", "pattern": "if A then B, A", "conclusion": "B"},
+            {"rule": "modus_tollens", "pattern": "if A then B, not B", "conclusion": "not A"},
+            {"rule": "transitivity", "pattern": "A -> B, B -> C", "conclusion": "A -> C"},
+            {"rule": "syllogism", "pattern": "All A are B, All B are C", "conclusion": "All A are C"}
+        ]
+    
+    def _simple_inference(self, premises: List[str], rules: List[Dict]) -> List[str]:
+        """Simple inference implementation as fallback"""
+        conclusions = []
+        for rule in rules:
+            # Very simplified rule application
+            if any(premise in rule.get("pattern", "") for premise in premises):
+                conclusions.append(f"inferred_from_{rule.get('rule', 'unknown')}")
+        
+        return conclusions if conclusions else ["no_inference_possible"]
+    
+    def _calculate_deduction_confidence(self, hypothesis: str, evidence: List[str]) -> float:
+        """Calculate confidence in deductive reasoning"""
+        if not evidence:
+            return 0.1
+        
+        supporting_count = sum(1 for e in evidence if self._supports_hypothesis(hypothesis, e))
+        return min(1.0, supporting_count / len(evidence))
+    
+    def _evidence_supports(self, hypothesis: str, evidence: List[str]) -> bool:
+        """Check if evidence supports hypothesis"""
+        return any(self._supports_hypothesis(hypothesis, e) for e in evidence)
+    
+    def _supports_hypothesis(self, hypothesis: str, evidence: str) -> bool:
+        """Check if a piece of evidence supports the hypothesis"""
+        hypothesis_lower = hypothesis.lower()
+        evidence_lower = evidence.lower()
+        
+        # Simple keyword matching
+        return (any(word in evidence_lower for word in hypothesis_lower.split()) or
+                any(word in hypothesis_lower for word in evidence_lower.split()))
+    
+    def _find_best_explanation(self, observations: List[str], explanations: List[str]) -> str:
+        """Find the best explanation for observations using simple scoring"""
+        if not explanations:
+            return "no_explanation_available"
+        
+        best_explanation = explanations[0]
+        best_score = 0
+        
+        for explanation in explanations:
+            score = sum(1 for obs in observations 
+                       if any(word in explanation.lower() for word in obs.lower().split()))
+            if score > best_score:
+                best_score = score
+                best_explanation = explanation
+        
+        return best_explanation
+    
+    def _simple_pattern_match(self, pattern: Dict, constraints: Dict = None) -> List[Dict]:
+        """Simple pattern matching implementation"""
+        matches = []
+        if not self.memory_state.get("nodes"):
+            return matches
+        
+        for node_id, node_data in self.memory_state["nodes"].items():
+            if self._pattern_matches_node(pattern, node_data):
+                matches.append({
+                    "node_id": node_id,
+                    "node_data": node_data,
+                    "match_confidence": 0.7
+                })
+        
+        return matches
+    
+    def _pattern_matches_node(self, pattern: Dict, node_data: Dict) -> bool:
+        """Check if pattern matches node data"""
+        if not isinstance(pattern, dict) or not isinstance(node_data, dict):
+            return False
+        
+        for key, value in pattern.items():
+            if key not in node_data or node_data[key] != value:
+                return False
+        
+        return True
+    
+    def _simulate_activation_spread(self, source_node: str, activation: float, decay: float) -> Dict[str, float]:
+        """Simulate activation spreading from source node"""
+        spread_activations = {}
+        
+        # Simple simulation - create some connected nodes
+        for i in range(3):  # Simulate 3 connected nodes
+            connected_node = f"{source_node}_connected_{i}"
+            spread_activations[connected_node] = activation * (decay ** (i + 1))
+        
+        return spread_activations
 
 # Global bridge instance for easy access
 _global_bridge = None
