@@ -768,14 +768,25 @@ class Echo9mlSystem:
         
         return False
 
-# Convenience function for easy instantiation
+# Convenience functions for easy instantiation
 def create_echo9ml_system(save_path: Optional[str] = None) -> Echo9mlSystem:
     """Create and initialize a new Echo9ml system"""
     return Echo9mlSystem(save_path)
+
+def create_deep_tree_echo() -> PersonaKernel:
+    """Create a Deep Tree Echo persona kernel
+    
+    Module-level convenience function for creating the default Deep Tree Echo
+    persona kernel. Provides unified API for integration with other components.
+    
+    Returns:
+        PersonaKernel: Initialized Deep Tree Echo persona kernel
+    """
+    return PersonaKernel.create_deep_tree_echo()
 
 # Export main classes for integration
 __all__ = [
     'PersonaKernel', 'TensorPersonaEncoding', 'HypergraphPersonaEncoder',
     'AttentionAllocationLayer', 'EvolutionEngine', 'MetaCognitiveEnhancer',
-    'Echo9mlSystem', 'PersonaTraitType', 'create_echo9ml_system'
+    'Echo9mlSystem', 'PersonaTraitType', 'create_echo9ml_system', 'create_deep_tree_echo'
 ]
