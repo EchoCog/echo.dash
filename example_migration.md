@@ -1,4 +1,4 @@
-# Migration Template for launch_deep_tree_echo.py
+# Migration Template for echoself_demo.py
 
 ## Before (Current Code):
 ```python
@@ -15,9 +15,9 @@ class ExistingClass:
 
 ## After (Standardized Code):
 ```python
-from echo_component_base import EchoComponent, EchoConfig, EchoResponse
+from echo_component_base import MemoryEchoComponent, EchoConfig, EchoResponse
 
-class ExistingClass(EchoComponent):
+class ExistingClass(MemoryEchoComponent):
     def __init__(self, config: EchoConfig):
         super().__init__(config)
         # Your specific initialization here
