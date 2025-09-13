@@ -1,41 +1,28 @@
 {
   "fragments": [
     {
-      "file": "deep_tree_echo_analyzer.py",
-      "lines": 493,
+      "file": "deep_tree_echo_analyzer_standardized.py",
+      "lines": 755,
       "classes": [
+        "DeepTreeEchoAnalyzerStandardized",
         "DeepTreeEchoAnalyzer"
       ],
       "functions": [
-        "echo"
+        "echo",
+        "_apply_echo_to_analysis",
+        "create_deep_tree_echo_analyzer"
       ],
       "imports": [
+        "deep_tree_echo_analyzer",
         "echo_component_base",
-        "ProcessingEchoComponent",
-        "ProcessingEchoComponent"
+        "MemoryEchoComponent",
+        "echo_component_base",
+        "MemoryEchoComponent",
+        "EchoComponent"
       ],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:36:19.328582"
-    },
-    {
-      "file": "launch_deep_tree_echo.py",
-      "lines": 363,
-      "classes": [
-        "DeepTreeEchoLauncherStandardized"
-      ],
-      "functions": [
-        "echo",
-        "create_deep_tree_echo_launcher"
-      ],
-      "imports": [
-        "echo_component_base",
-        "EchoComponent",
-        "EchoComponent"
-      ],
-      "type": "core",
-      "status": "active",
-      "last_modified": "2025-08-17T21:30:20.834174"
+      "last_modified": "2025-09-13T17:13:37.803220"
     },
     {
       "file": "deep_tree_echo.py",
@@ -60,20 +47,79 @@
       ],
       "type": "core",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.284174"
+      "last_modified": "2025-09-13T17:13:37.802220"
     },
     {
-      "file": "echoself_introspection.py",
-      "lines": 756,
+      "file": "launch_deep_tree_echo.py",
+      "lines": 367,
       "classes": [
-        "EchoselfIntrospection",
-        "EchoselfIntrospector"
+        "DeepTreeEchoLauncherStandardized"
       ],
+      "functions": [
+        "echo",
+        "create_deep_tree_echo_launcher"
+      ],
+      "imports": [
+        "echo_component_base",
+        "EchoComponent",
+        "EchoComponent"
+      ],
+      "type": "core",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.806220"
+    },
+    {
+      "file": "deep_tree_echo_analyzer.py",
+      "lines": 529,
+      "classes": [
+        "DeepTreeEchoAnalyzer"
+      ],
+      "functions": [
+        "echo"
+      ],
+      "imports": [
+        "ProcessingEchoComponent",
+        "echo_component_base",
+        "ProcessingEchoComponent",
+        "ProcessingEchoComponent"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:18:01.751980"
+    },
+    {
+      "file": "deep_tree_echo_analyzer_standardized.py",
+      "lines": 755,
+      "classes": [
+        "DeepTreeEchoAnalyzerStandardized",
+        "DeepTreeEchoAnalyzer"
+      ],
+      "functions": [
+        "echo",
+        "_apply_echo_to_analysis",
+        "create_deep_tree_echo_analyzer"
+      ],
+      "imports": [
+        "deep_tree_echo_analyzer",
+        "echo_component_base",
+        "MemoryEchoComponent",
+        "echo_component_base",
+        "MemoryEchoComponent",
+        "EchoComponent"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.803220"
+    },
+    {
+      "file": "trigger_echopilot.py",
+      "lines": 367,
+      "classes": [],
       "functions": [],
       "imports": [],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.833174"
+      "last_modified": "2025-09-13T17:13:37.887222"
     },
     {
       "file": "echoself_demo.py",
@@ -83,46 +129,7 @@
       "imports": [],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.833174"
-    },
-    {
-      "file": "echo_api_standardizer.py",
-      "lines": 431,
-      "classes": [
-        "EchoAPIStandardizer"
-      ],
-      "functions": [
-        "scan_echo_components",
-        "echo"
-      ],
-      "imports": [
-        "echo_component_base",
-        "echo_component_base",
-        "echo_component_base",
-        "echo_component_base",
-        "EchoConfig"
-      ],
-      "type": "extension",
-      "status": "active",
-      "last_modified": "2025-08-17T21:30:20.832175"
-    },
-    {
-      "file": "echopilot.py",
-      "lines": 402,
-      "classes": [
-        "EchoPilotStandardized"
-      ],
-      "functions": [
-        "echo"
-      ],
-      "imports": [
-        "echo_component_base",
-        "ProcessingEchoComponent",
-        "ProcessingEchoComponent"
-      ],
-      "type": "extension",
-      "status": "active",
-      "last_modified": "2025-08-17T21:30:20.832175"
+      "last_modified": "2025-09-13T17:13:37.805220"
     },
     {
       "file": "echoself_demo_standardized.py",
@@ -140,62 +147,7 @@
       ],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.833174"
-    },
-    {
-      "file": "echo_memory_demo_standardized.py",
-      "lines": 364,
-      "classes": [
-        "EchoMemoryDemoStandardized"
-      ],
-      "functions": [
-        "echo"
-      ],
-      "imports": [
-        "echo_component_base",
-        "Echo",
-        "MemoryEchoComponent"
-      ],
-      "type": "extension",
-      "status": "active",
-      "last_modified": "2025-08-17T21:30:20.832175"
-    },
-    {
-      "file": "deep_tree_echo_analyzer.py",
-      "lines": 493,
-      "classes": [
-        "DeepTreeEchoAnalyzer"
-      ],
-      "functions": [
-        "echo"
-      ],
-      "imports": [
-        "echo_component_base",
-        "ProcessingEchoComponent",
-        "ProcessingEchoComponent"
-      ],
-      "type": "extension",
-      "status": "active",
-      "last_modified": "2025-08-17T21:36:19.328582"
-    },
-    {
-      "file": "launch_deep_tree_echo.py",
-      "lines": 363,
-      "classes": [
-        "DeepTreeEchoLauncherStandardized"
-      ],
-      "functions": [
-        "echo",
-        "create_deep_tree_echo_launcher"
-      ],
-      "imports": [
-        "echo_component_base",
-        "EchoComponent",
-        "EchoComponent"
-      ],
-      "type": "core",
-      "status": "active",
-      "last_modified": "2025-08-17T21:30:20.834174"
+      "last_modified": "2025-09-13T17:13:37.805220"
     },
     {
       "file": "echo9ml.py",
@@ -213,48 +165,20 @@
       ],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.832175"
+      "last_modified": "2025-09-13T17:13:37.803220"
     },
     {
-      "file": "trigger_echopilot.py",
-      "lines": 367,
+      "file": "echo9ml_demo.py",
+      "lines": 320,
       "classes": [],
       "functions": [],
-      "imports": [],
-      "type": "extension",
-      "status": "active",
-      "last_modified": "2025-08-17T21:30:20.913175"
-    },
-    {
-      "file": "echo_evolution.py",
-      "lines": 554,
-      "classes": [
-        "EchoAgent"
-      ],
-      "functions": [],
       "imports": [
-        "echopilot"
+        "echo9ml",
+        "create_echo9ml_system"
       ],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.832175"
-    },
-    {
-      "file": "echopilot_standardized.py",
-      "lines": 395,
-      "classes": [],
-      "functions": [
-        "echo",
-        "echo"
-      ],
-      "imports": [
-        "echo_component_base",
-        "ProcessingEchoComponent",
-        "ProcessingEchoComponent"
-      ],
-      "type": "extension",
-      "status": "active",
-      "last_modified": "2025-08-17T21:30:20.833174"
+      "last_modified": "2025-09-13T17:13:37.803220"
     },
     {
       "file": "echo_component_base.py",
@@ -279,33 +203,68 @@
       "imports": [],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.832175"
+      "last_modified": "2025-09-13T17:13:37.804220"
     },
     {
-      "file": "echo9ml_demo.py",
-      "lines": 320,
-      "classes": [],
-      "functions": [],
+      "file": "echo_evolution_standardized.py",
+      "lines": 742,
+      "classes": [
+        "EchoEvolutionStandardized"
+      ],
+      "functions": [
+        "echo",
+        "_apply_echo_to_evolution",
+        "create_echo_evolution"
+      ],
       "imports": [
+        "echo_evolution",
+        "echo_component_base",
+        "MemoryEchoComponent",
+        "MemoryEchoComponent"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.804220"
+    },
+    {
+      "file": "echopilot_standardized.py",
+      "lines": 395,
+      "classes": [],
+      "functions": [
+        "echo",
+        "echo"
+      ],
+      "imports": [
+        "echo_component_base",
+        "ProcessingEchoComponent",
+        "ProcessingEchoComponent"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.805220"
+    },
+    {
+      "file": "echo9ml_demo_standardized.py",
+      "lines": 666,
+      "classes": [
+        "Echo9mlDemoStandardized"
+      ],
+      "functions": [
+        "echo",
+        "_apply_echo_to_persona",
+        "create_echo9ml_demo"
+      ],
+      "imports": [
+        "echo9ml_demo",
+        "echo_component_base",
+        "echo9ml",
+        "MemoryEchoComponent",
         "echo9ml",
         "create_echo9ml_system"
       ],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.832175"
-    },
-    {
-      "file": "echo9ml_integration.py",
-      "lines": 340,
-      "classes": [],
-      "functions": [],
-      "imports": [
-        "echo9ml",
-        "Echo9mlSystem"
-      ],
-      "type": "extension",
-      "status": "active",
-      "last_modified": "2025-08-17T21:30:20.832175"
+      "last_modified": "2025-09-13T17:13:37.804220"
     },
     {
       "file": "deep_tree_echo.py",
@@ -330,11 +289,189 @@
       ],
       "type": "core",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.284174"
+      "last_modified": "2025-09-13T17:13:37.802220"
+    },
+    {
+      "file": "echo9ml_integration_standardized.py",
+      "lines": 806,
+      "classes": [
+        "Echo9mlIntegrationStandardized"
+      ],
+      "functions": [
+        "echo",
+        "_apply_echo_to_integration",
+        "create_echo9ml_integration"
+      ],
+      "imports": [
+        "echo9ml_integration",
+        "echo_component_base",
+        "echo9ml",
+        "MemoryEchoComponent",
+        "Echo9mlSystem"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.804220"
+    },
+    {
+      "file": "echoself_introspection.py",
+      "lines": 756,
+      "classes": [
+        "EchoselfIntrospection",
+        "EchoselfIntrospector"
+      ],
+      "functions": [],
+      "imports": [],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.805220"
+    },
+    {
+      "file": "echopilot.py",
+      "lines": 402,
+      "classes": [
+        "EchoPilotStandardized"
+      ],
+      "functions": [
+        "echo"
+      ],
+      "imports": [
+        "echo_component_base",
+        "ProcessingEchoComponent",
+        "ProcessingEchoComponent"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.804220"
+    },
+    {
+      "file": "echo9ml_integration.py",
+      "lines": 340,
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "echo9ml",
+        "Echo9mlSystem"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.804220"
+    },
+    {
+      "file": "echo_evolution.py",
+      "lines": 554,
+      "classes": [
+        "EchoAgent"
+      ],
+      "functions": [],
+      "imports": [
+        "echopilot"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.804220"
+    },
+    {
+      "file": "echo_memory_demo_standardized.py",
+      "lines": 364,
+      "classes": [
+        "EchoMemoryDemoStandardized"
+      ],
+      "functions": [
+        "echo"
+      ],
+      "imports": [
+        "echo_component_base",
+        "Echo",
+        "MemoryEchoComponent"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.804220"
+    },
+    {
+      "file": "launch_deep_tree_echo.py",
+      "lines": 367,
+      "classes": [
+        "DeepTreeEchoLauncherStandardized"
+      ],
+      "functions": [
+        "echo",
+        "create_deep_tree_echo_launcher"
+      ],
+      "imports": [
+        "echo_component_base",
+        "EchoComponent",
+        "EchoComponent"
+      ],
+      "type": "core",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.806220"
+    },
+    {
+      "file": "echo_api_standardizer.py",
+      "lines": 431,
+      "classes": [
+        "EchoAPIStandardizer"
+      ],
+      "functions": [
+        "scan_echo_components",
+        "echo"
+      ],
+      "imports": [
+        "echo_component_base",
+        "echo_component_base",
+        "echo_component_base",
+        "echo_component_base",
+        "EchoConfig"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.804220"
+    },
+    {
+      "file": "trigger_echopilot_standardized.py",
+      "lines": 476,
+      "classes": [
+        "EchoPilotTriggerStandardized"
+      ],
+      "functions": [
+        "echo",
+        "_amplify_issues_by_echo",
+        "create_echopilot_trigger"
+      ],
+      "imports": [
+        "trigger_echopilot",
+        "echo_component_base",
+        "MemoryEchoComponent",
+        "MemoryEchoComponent"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:13:37.887222"
+    },
+    {
+      "file": "deep_tree_echo_analyzer.py",
+      "lines": 529,
+      "classes": [
+        "DeepTreeEchoAnalyzer"
+      ],
+      "functions": [
+        "echo"
+      ],
+      "imports": [
+        "ProcessingEchoComponent",
+        "echo_component_base",
+        "ProcessingEchoComponent",
+        "ProcessingEchoComponent"
+      ],
+      "type": "extension",
+      "status": "active",
+      "last_modified": "2025-09-13T17:18:01.751980"
     },
     {
       "file": "unified_echo_memory.py",
-      "lines": 960,
+      "lines": 1049,
       "classes": [
         "EchoMemoryConfig",
         "UnifiedEchoMemory"
@@ -351,7 +488,7 @@
       ],
       "type": "extension",
       "status": "active",
-      "last_modified": "2025-08-17T21:30:20.913175"
+      "last_modified": "2025-09-13T17:13:37.887222"
     }
   ],
   "architecture_gaps": [
@@ -392,48 +529,60 @@
       "description": "Different interfaces across Echo fragments creating integration challenges",
       "priority": "medium",
       "files": [
-        "deep_tree_echo_analyzer.py",
-        "launch_deep_tree_echo.py",
+        "deep_tree_echo_analyzer_standardized.py",
         "deep_tree_echo.py",
-        "echoself_introspection.py",
-        "echoself_demo.py",
-        "echo_api_standardizer.py",
-        "echopilot.py",
-        "echoself_demo_standardized.py",
-        "echo_memory_demo_standardized.py",
-        "deep_tree_echo_analyzer.py",
         "launch_deep_tree_echo.py",
-        "echo9ml.py",
+        "deep_tree_echo_analyzer.py",
+        "deep_tree_echo_analyzer_standardized.py",
         "trigger_echopilot.py",
-        "echo_evolution.py",
-        "echopilot_standardized.py",
-        "echo_component_base.py",
+        "echoself_demo.py",
+        "echoself_demo_standardized.py",
+        "echo9ml.py",
         "echo9ml_demo.py",
-        "echo9ml_integration.py",
+        "echo_component_base.py",
+        "echo_evolution_standardized.py",
+        "echopilot_standardized.py",
+        "echo9ml_demo_standardized.py",
         "deep_tree_echo.py",
+        "echo9ml_integration_standardized.py",
+        "echoself_introspection.py",
+        "echopilot.py",
+        "echo9ml_integration.py",
+        "echo_evolution.py",
+        "echo_memory_demo_standardized.py",
+        "launch_deep_tree_echo.py",
+        "echo_api_standardizer.py",
+        "trigger_echopilot_standardized.py",
+        "deep_tree_echo_analyzer.py",
         "unified_echo_memory.py"
       ],
       "evidence": "Multiple Echo classes with varying method signatures",
       "existing_files": [
-        "deep_tree_echo_analyzer.py",
-        "launch_deep_tree_echo.py",
+        "deep_tree_echo_analyzer_standardized.py",
         "deep_tree_echo.py",
-        "echoself_introspection.py",
-        "echoself_demo.py",
-        "echo_api_standardizer.py",
-        "echopilot.py",
-        "echoself_demo_standardized.py",
-        "echo_memory_demo_standardized.py",
-        "deep_tree_echo_analyzer.py",
         "launch_deep_tree_echo.py",
-        "echo9ml.py",
+        "deep_tree_echo_analyzer.py",
+        "deep_tree_echo_analyzer_standardized.py",
         "trigger_echopilot.py",
-        "echo_evolution.py",
-        "echopilot_standardized.py",
-        "echo_component_base.py",
+        "echoself_demo.py",
+        "echoself_demo_standardized.py",
+        "echo9ml.py",
         "echo9ml_demo.py",
-        "echo9ml_integration.py",
+        "echo_component_base.py",
+        "echo_evolution_standardized.py",
+        "echopilot_standardized.py",
+        "echo9ml_demo_standardized.py",
         "deep_tree_echo.py",
+        "echo9ml_integration_standardized.py",
+        "echoself_introspection.py",
+        "echopilot.py",
+        "echo9ml_integration.py",
+        "echo_evolution.py",
+        "echo_memory_demo_standardized.py",
+        "launch_deep_tree_echo.py",
+        "echo_api_standardizer.py",
+        "trigger_echopilot_standardized.py",
+        "deep_tree_echo_analyzer.py",
         "unified_echo_memory.py"
       ]
     },
@@ -484,41 +633,53 @@
       "description": "Create consistent interface across all Echo components",
       "type": "refactor",
       "files": [
+        "deep_tree_echo_analyzer_standardized.py",
         "deep_tree_echo_analyzer.py",
-        "echoself_introspection.py",
-        "echoself_demo.py",
-        "echo_api_standardizer.py",
-        "echopilot.py",
-        "echoself_demo_standardized.py",
-        "echo_memory_demo_standardized.py",
-        "deep_tree_echo_analyzer.py",
-        "echo9ml.py",
+        "deep_tree_echo_analyzer_standardized.py",
         "trigger_echopilot.py",
-        "echo_evolution.py",
-        "echopilot_standardized.py",
-        "echo_component_base.py",
+        "echoself_demo.py",
+        "echoself_demo_standardized.py",
+        "echo9ml.py",
         "echo9ml_demo.py",
+        "echo_component_base.py",
+        "echo_evolution_standardized.py",
+        "echopilot_standardized.py",
+        "echo9ml_demo_standardized.py",
+        "echo9ml_integration_standardized.py",
+        "echoself_introspection.py",
+        "echopilot.py",
         "echo9ml_integration.py",
+        "echo_evolution.py",
+        "echo_memory_demo_standardized.py",
+        "echo_api_standardizer.py",
+        "trigger_echopilot_standardized.py",
+        "deep_tree_echo_analyzer.py",
         "unified_echo_memory.py"
       ],
       "estimated_effort": "medium",
       "implementation": "Define EchoComponent base class with standard methods",
       "existing_files": [
+        "deep_tree_echo_analyzer_standardized.py",
         "deep_tree_echo_analyzer.py",
-        "echoself_introspection.py",
-        "echoself_demo.py",
-        "echo_api_standardizer.py",
-        "echopilot.py",
-        "echoself_demo_standardized.py",
-        "echo_memory_demo_standardized.py",
-        "deep_tree_echo_analyzer.py",
-        "echo9ml.py",
+        "deep_tree_echo_analyzer_standardized.py",
         "trigger_echopilot.py",
-        "echo_evolution.py",
-        "echopilot_standardized.py",
-        "echo_component_base.py",
+        "echoself_demo.py",
+        "echoself_demo_standardized.py",
+        "echo9ml.py",
         "echo9ml_demo.py",
+        "echo_component_base.py",
+        "echo_evolution_standardized.py",
+        "echopilot_standardized.py",
+        "echo9ml_demo_standardized.py",
+        "echo9ml_integration_standardized.py",
+        "echoself_introspection.py",
+        "echopilot.py",
         "echo9ml_integration.py",
+        "echo_evolution.py",
+        "echo_memory_demo_standardized.py",
+        "echo_api_standardizer.py",
+        "trigger_echopilot_standardized.py",
+        "deep_tree_echo_analyzer.py",
         "unified_echo_memory.py"
       ]
     },
@@ -536,7 +697,7 @@
       ]
     }
   ],
-  "analysis_timestamp": "2025-08-17T21:37:23.877681",
+  "analysis_timestamp": "2025-09-13T17:18:19.924074",
   "recommendations": [
     {
       "action": "Archive Legacy Files",

@@ -36,11 +36,13 @@ from datetime import datetime
 # Import unified architecture components
 try:
     from echo_component_base import ProcessingEchoComponent, EchoConfig, EchoResponse
+    ECHO_STANDARDIZED_AVAILABLE = True
 except ImportError:
     # Fallback if component base is not available
     ProcessingEchoComponent = object
     EchoConfig = type('EchoConfig', (), {})
     EchoResponse = type('EchoResponse', (), {})
+    ECHO_STANDARDIZED_AVAILABLE = False
 
 
 class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
@@ -51,10 +53,19 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
     
     def __init__(self, repo_path: str = ".", config: EchoConfig = None):
         # Initialize with unified architecture if available
-        if hasattr(ProcessingEchoComponent, '__init__') and config is not None:
+        if ECHO_STANDARDIZED_AVAILABLE and config is not None:
             super().__init__(config)
+        elif ECHO_STANDARDIZED_AVAILABLE:
+            # Create default config if none provided
+            default_config = EchoConfig(
+                component_name="DeepTreeEchoAnalyzer",
+                version="1.0.0",
+                debug_mode=False
+            )
+            super().__init__(default_config)
         
-        self.repo_path = Path(repo_path)
+        self.repo_path = Path(repo_path) 
+        self.analysis_depth = 10  # Default analysis depth
         self.results = {
             'fragments': [],
             'architecture_gaps': [],
@@ -334,34 +345,29 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
         return self.save_analysis()
 
     # Unified Architecture Interface Methods
-    def initialize(self) -> 'EchoResponse':
+    def initialize(self) -> EchoResponse:
         """Initialize the analyzer component"""
         try:
-            # Set initialized flag if unified architecture is available
-            if hasattr(self, '_initialized'):
+            if ECHO_STANDARDIZED_AVAILABLE:
                 self._initialized = True
-            
-            # Log initialization if logger is available
-            if hasattr(self, 'logger'):
                 self.logger.info(f"Deep Tree Echo Analyzer initialized for path: {self.repo_path}")
-            
-            # Check if we have the real EchoResponse class available
-            try:
+                
                 return EchoResponse(
                     success=True,
                     message="Deep Tree Echo Analyzer initialized successfully",
                     metadata={'repo_path': str(self.repo_path)}
                 )
-            except TypeError:
-                # Fallback if EchoResponse is not the real class
-                return True
+            else:
+                # Fallback for non-standardized mode
+                print(f"Deep Tree Echo Analyzer initialized for path: {self.repo_path}")
+                return {'success': True, 'message': 'Initialized in legacy mode'}
         except Exception as e:
-            if hasattr(self, 'handle_error'):
+            if ECHO_STANDARDIZED_AVAILABLE:
                 return self.handle_error(e, "initialize")
             else:
-                return False
+                return {'success': False, 'error': str(e)}
 
-    def process(self, input_data: Any = None, **kwargs) -> 'EchoResponse':
+    def process(self, input_data: Any = None, **kwargs) -> EchoResponse:
         """Process analysis request through unified interface
         
         Args:
@@ -372,17 +378,17 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
             EchoResponse with analysis results
         """
         try:
-            # Validate input if method is available
-            if hasattr(self, 'validate_input') and input_data is not None:
+            # Validate input if using standardized mode
+            if ECHO_STANDARDIZED_AVAILABLE and input_data is not None:
                 validation = self.validate_input(input_data)
-                if hasattr(validation, 'success') and not validation.success:
+                if not validation.success:
                     return validation
             
             # Run the full analysis
             analysis_file = self.run_full_analysis()
             
-            # Try to return EchoResponse, fallback to data if not available
-            try:
+            # Return appropriate response format
+            if ECHO_STANDARDIZED_AVAILABLE:
                 return EchoResponse(
                     success=True,
                     data=self.results,
@@ -394,15 +400,15 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
                         'tasks_generated': len(self.results.get('migration_tasks', []))
                     }
                 )
-            except TypeError:
+            else:
                 return self.results
         except Exception as e:
-            if hasattr(self, 'handle_error'):
+            if ECHO_STANDARDIZED_AVAILABLE:
                 return self.handle_error(e, "process")
             else:
                 return {'error': str(e)}
 
-    def echo(self, data: Any = None, echo_value: float = 0.0) -> 'EchoResponse':
+    def echo(self, data: Any = None, echo_value: float = 0.0) -> EchoResponse:
         """Perform echo analysis operation
         
         Args:
@@ -414,23 +420,31 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
         """
         try:
             # Use echo_value to adjust analysis parameters
-            original_depth = getattr(self, 'analysis_depth', 10)
+            original_depth = self.analysis_depth
             
             # Higher echo values mean deeper analysis
             adjusted_depth = int(original_depth * (1.0 + echo_value))
+            self.analysis_depth = adjusted_depth
             
             # Process with enhanced depth if applicable
             if data is not None and isinstance(data, (str, Path)):
                 # Analyze different repository path if provided
                 original_path = self.repo_path
                 self.repo_path = Path(data)
-            
-            # Run analysis with echo enhancement
-            analysis_result = self.process(data)
-            
-            # Add echo metadata - try to return proper EchoResponse
-            if hasattr(analysis_result, 'data'):
                 try:
+                    analysis_result = self.process(data)
+                finally:
+                    # Restore original path
+                    self.repo_path = original_path
+            else:
+                analysis_result = self.process(data)
+            
+            # Restore original depth
+            self.analysis_depth = original_depth
+            
+            # Add echo metadata
+            if ECHO_STANDARDIZED_AVAILABLE:
+                if hasattr(analysis_result, 'data'):
                     echo_enhanced_data = {
                         'analysis_results': analysis_result.data,
                         'echo_value': echo_value,
@@ -444,13 +458,18 @@ class DeepTreeEchoAnalyzer(ProcessingEchoComponent):
                         message=f"Echo analysis completed (echo_value: {echo_value})",
                         metadata={'echo_value': echo_value, 'analysis_depth': adjusted_depth}
                     )
-                except TypeError:
+                else:
                     return analysis_result
             else:
-                return analysis_result
+                # Legacy mode
+                return {
+                    'analysis_results': analysis_result,
+                    'echo_value': echo_value,
+                    'adjusted_depth': adjusted_depth
+                }
                 
         except Exception as e:
-            if hasattr(self, 'handle_error'):
+            if ECHO_STANDARDIZED_AVAILABLE:
                 return self.handle_error(e, "echo")
             else:
                 return {'error': str(e), 'echo_value': echo_value}
