@@ -6,6 +6,44 @@ Inspired by DeepTreeEcho/Eva Self Model and echoself.md
 
 This module implements the recursive self-model integration with hypergraph encoding
 and adaptive attention allocation as specified in the Echoself vision.
+
+## Features:
+- Hypergraph-encoded repository analysis
+- Semantic salience assessment
+- Adaptive attention allocation based on cognitive load
+- Recursive self-model introspection
+- Unified Echo Component architecture integration
+
+## Usage:
+
+### Standalone Mode:
+```python
+from echoself_introspection import EchoselfIntrospector
+
+introspector = EchoselfIntrospector()
+prompt = introspector.inject_repo_input_into_prompt(current_load=0.6, recent_activity=0.4)
+snapshot = introspector.get_cognitive_snapshot()
+```
+
+### Unified Echo Component Mode:
+```python
+from echoself_introspection import EchoselfIntrospectionComponent
+from echo_component_base import EchoConfig
+
+config = EchoConfig(component_name="introspection", version="1.0.0")
+component = EchoselfIntrospectionComponent(config)
+
+# Standard Echo operations
+component.initialize()
+result = component.process({'current_load': 0.7, 'recent_activity': 0.3})
+echo_result = component.echo("data", echo_value=0.8)
+```
+
+## Integration Points:
+- Extends EchoComponent base class for unified architecture
+- Implements standard Echo operations (initialize, process, echo)
+- Provides introspection-specific methods (get_introspection_metrics, export_hypergraph)
+- Maintains backward compatibility with existing code
 """
 
 import os
@@ -16,6 +54,12 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple, Union
 from dataclasses import dataclass, field
 from collections import defaultdict
+
+try:
+    from echo_component_base import EchoComponent, EchoConfig, EchoResponse
+    _ECHO_INTEGRATION_AVAILABLE = True
+except ImportError:
+    _ECHO_INTEGRATION_AVAILABLE = False
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -733,9 +777,177 @@ class EchoselfIntrospector:
             'repository_root': str(self.repository_root)
         }
 
+
+# Unified Echo Component Interface Integration
+if _ECHO_INTEGRATION_AVAILABLE:
+    class EchoselfIntrospectionComponent(EchoComponent):
+        """
+        Unified Echo Component interface for Echoself Introspection.
+        
+        Integrates the existing EchoselfIntrospector functionality with the 
+        standardized Echo component architecture.
+        """
+        
+        def __init__(self, config: Optional[EchoConfig] = None, repository_root: Optional[Path] = None):
+            # Create default config if none provided
+            if config is None:
+                config = EchoConfig(
+                    component_name="echoself_introspection",
+                    version="1.0.0",
+                    echo_threshold=0.5,
+                    max_depth=10,
+                    debug_mode=False
+                )
+            
+            super().__init__(config)
+            
+            # Initialize core introspection functionality
+            self.repository_root = repository_root or Path.cwd()
+            self.introspector = EchoselfIntrospector(self.repository_root)
+            
+        def initialize(self) -> EchoResponse:
+            """Initialize the introspection component"""
+            try:
+                # Verify repository access
+                if not self.repository_root.exists():
+                    return EchoResponse(
+                        success=False,
+                        message=f"Repository root does not exist: {self.repository_root}"
+                    )
+                
+                self._initialized = True
+                self.logger.info(f"Initialized introspection for repository: {self.repository_root}")
+                
+                return EchoResponse(
+                    success=True,
+                    message="Echoself introspection component initialized",
+                    metadata={'repository_root': str(self.repository_root)}
+                )
+            except Exception as e:
+                return self.handle_error(e, "initialize")
+        
+        def process(self, input_data: Any, **kwargs) -> EchoResponse:
+            """
+            Process introspection request.
+            
+            Args:
+                input_data: Processing parameters (dict with 'current_load', 'recent_activity')
+                **kwargs: Additional parameters
+            """
+            try:
+                if not self._initialized:
+                    init_result = self.initialize()
+                    if not init_result.success:
+                        return init_result
+                
+                # Extract parameters
+                if isinstance(input_data, dict):
+                    current_load = input_data.get('current_load', 0.6)
+                    recent_activity = input_data.get('recent_activity', 0.4)
+                else:
+                    current_load = kwargs.get('current_load', 0.6)
+                    recent_activity = kwargs.get('recent_activity', 0.4)
+                
+                # Generate cognitive snapshot
+                snapshot = self.introspector.get_cognitive_snapshot(
+                    current_load=current_load,
+                    recent_activity=recent_activity
+                )
+                
+                return EchoResponse(
+                    success=True,
+                    data=snapshot,
+                    message=f"Cognitive snapshot generated: {snapshot['total_files_processed']} files processed",
+                    metadata={
+                        'attention_threshold': snapshot['attention_threshold'],
+                        'cognitive_load': snapshot['cognitive_load'],
+                        'average_salience': snapshot['average_salience']
+                    }
+                )
+                
+            except Exception as e:
+                return self.handle_error(e, "process")
+        
+        def echo(self, data: Any, echo_value: float = 0.0) -> EchoResponse:
+            """
+            Perform echo operation with introspection.
+            
+            Generates an introspection prompt based on the echo value as cognitive load.
+            """
+            try:
+                if not self._initialized:
+                    init_result = self.initialize()
+                    if not init_result.success:
+                        return init_result
+                
+                # Use echo_value as cognitive load indicator
+                current_load = min(echo_value, 1.0)  # Clamp to [0, 1]
+                recent_activity = 0.5  # Default activity level
+                
+                # Generate introspection prompt
+                prompt = self.introspector.inject_repo_input_into_prompt(
+                    current_load=current_load,
+                    recent_activity=recent_activity
+                )
+                
+                echo_data = {
+                    'original_data': data,
+                    'echo_value': echo_value,
+                    'introspection_prompt': prompt,
+                    'cognitive_load': current_load,
+                    'timestamp': time.time()
+                }
+                
+                return EchoResponse(
+                    success=True,
+                    data=echo_data,
+                    message=f"Echo introspection completed (echo_value: {echo_value})",
+                    metadata={
+                        'echo_value': echo_value,
+                        'cognitive_load': current_load,
+                        'prompt_length': len(prompt)
+                    }
+                )
+                
+            except Exception as e:
+                return self.handle_error(e, "echo")
+        
+        def get_introspection_metrics(self) -> EchoResponse:
+            """Get introspection-specific metrics"""
+            try:
+                metrics = self.introspector.introspector.get_attention_metrics()
+                
+                return EchoResponse(
+                    success=True,
+                    data=metrics,
+                    message="Introspection metrics retrieved"
+                )
+            except Exception as e:
+                return self.handle_error(e, "get_introspection_metrics")
+        
+        def export_hypergraph(self, output_path: Optional[str] = None) -> EchoResponse:
+            """Export hypergraph structure"""
+            try:
+                if output_path is None:
+                    output_path = f"echoself_hypergraph_{int(time.time())}.json"
+                
+                self.introspector.introspector.export_hypergraph(output_path)
+                
+                return EchoResponse(
+                    success=True,
+                    data={'output_path': output_path},
+                    message=f"Hypergraph exported to {output_path}"
+                )
+            except Exception as e:
+                return self.handle_error(e, "export_hypergraph")
+
+
 # Example usage and integration point
 def main():
     """Example usage of the introspection system"""
+    print("=== ECHOSELF INTROSPECTION DEMO ===")
+    
+    # Original interface
     introspector = EchoselfIntrospector()
     
     # Example of adaptive attention usage
@@ -751,6 +963,41 @@ def main():
     snapshot = introspector.get_cognitive_snapshot()
     print(f"\nCognitive snapshot: {snapshot['total_files_processed']} files, "
           f"avg salience: {snapshot['average_salience']:.3f}")
+    
+    # Demonstrate unified interface if available
+    if _ECHO_INTEGRATION_AVAILABLE:
+        print("\n=== UNIFIED ECHO COMPONENT INTERFACE ===")
+        
+        # Create unified component
+        config = EchoConfig(
+            component_name="echoself_demo",
+            version="1.0.0",
+            debug_mode=True
+        )
+        unified_component = EchoselfIntrospectionComponent(config)
+        
+        # Initialize
+        init_result = unified_component.initialize()
+        print(f"Initialization: {init_result.message}")
+        
+        # Process
+        process_result = unified_component.process({
+            'current_load': 0.7,
+            'recent_activity': 0.3
+        })
+        print(f"Processing: {process_result.message}")
+        
+        # Echo operation
+        echo_result = unified_component.echo("Test introspection data", echo_value=0.8)
+        print(f"Echo operation: {echo_result.message}")
+        
+        # Get metrics
+        metrics_result = unified_component.get_introspection_metrics()
+        if metrics_result.success:
+            print(f"Metrics available: {list(metrics_result.data.keys())}")
+    else:
+        print("\n=== Echo Component Base not available - using standalone mode ===")
+
 
 if __name__ == "__main__":
     main()
