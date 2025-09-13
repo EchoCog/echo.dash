@@ -102,7 +102,10 @@ graph TD
 | Fragment | Type | Dependencies | Integration Level | Migration Priority |
 |----------|------|--------------|-------------------|-------------------|
 | `deep_tree_echo.py` | Core | High | Primary | N/A (Current) |
-| `archive/legacy/deep_tree_echo-v*.py` | Legacy | Low | Archived | Completed (Archived) |
+| `archive/legacy/deep_tree_echo-v*.py` | Legacy | Low | Archived ✅ | Completed ✅ |
+| `archive/legacy/cronbot-v*.py` | Legacy | Low | Archived ✅ | Completed ✅ |
+| `archive/legacy/echopilot-v*.py` | Legacy | Low | Archived ✅ | Completed ✅ |
+| `archive/legacy/activity_regulation-old.py` | Legacy | Low | Archived ✅ | Completed ✅ |
 | `browser_interface.py` | Extension | Medium | Integrated | Medium |
 | `echo9ml.py` | Parallel | Medium | Complementary | Medium |
 | `echo_evolution.py` | Extension | Medium | Feeding | Low |
@@ -156,7 +159,7 @@ graph TD
 ## 📊 Migration Roadmap
 
 ### Phase 1: Consolidation
-- [ ] Archive legacy versions
+- [x] Archive legacy versions (Completed: deep_tree_echo-v1/v2, cronbot-v0/v1/v2, echopilot-v0/v1/v2, activity_regulation-old)
 - [ ] Unify memory systems
 - [ ] Standardize APIs
 - [ ] Create comprehensive test suite
