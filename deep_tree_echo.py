@@ -8,6 +8,16 @@ from ml_system import MLSystem
 from emotional_dynamics import EmotionalDynamics, EmotionalState, CoreEmotion
 from differential_emotion_theory import DifferentialEmotionSystem, DETState, DETEmotion, EmotionalScript
 
+# Import standardized Echo components for API compatibility
+try:
+    from echo_component_base import MemoryEchoComponent, EchoConfig, EchoResponse
+    ECHO_STANDARDIZED_AVAILABLE = True
+except ImportError:
+    MemoryEchoComponent = object
+    EchoConfig = None
+    EchoResponse = None
+    ECHO_STANDARDIZED_AVAILABLE = False
+
 @dataclass
 class SpatialContext:
     """Spatial context for 3D environment awareness"""
@@ -1159,3 +1169,277 @@ class DeepTreeEcho:
             extension_membrane = self.membrane_manager.membranes["extension"]
             return extension_membrane.load_extension(extension_name, extension_data)
         return False
+    
+    # Standardized Echo Component API methods
+    def initialize_echo_component(self, config: 'EchoConfig' = None) -> Any:
+        """
+        Initialize DeepTreeEcho as a standardized Echo component
+        
+        This method provides compatibility with the standardized Echo component API
+        while maintaining the existing initialization approach.
+        """
+        if not ECHO_STANDARDIZED_AVAILABLE:
+            # Fallback for non-standardized environments
+            self.logger.info("DeepTreeEcho initialized in legacy mode")
+            return {"success": True, "message": "DeepTreeEcho initialized (legacy mode)"}
+        
+        # Create default configuration if none provided
+        if config is None:
+            config = EchoConfig(
+                component_name="DeepTreeEcho",
+                version="1.0.0",
+                echo_threshold=self.echo_threshold,
+                max_depth=self.max_depth,
+                debug_mode=False
+            )
+        
+        # Update configuration from provided config
+        if hasattr(config, 'echo_threshold'):
+            self.echo_threshold = config.echo_threshold
+        if hasattr(config, 'max_depth'):
+            self.max_depth = config.max_depth
+        
+        self.logger.info(f"DeepTreeEcho initialized as standardized component: {config.component_name}")
+        
+        return EchoResponse(
+            success=True,
+            message="DeepTreeEcho initialized as standardized Echo component",
+            data={
+                'echo_threshold': self.echo_threshold,
+                'max_depth': self.max_depth,
+                'spatial_awareness': self.spatial_awareness_enabled,
+                'membrane_system': bool(self.membrane_manager),
+                'emotional_dynamics': bool(self.emotional_dynamics),
+                'det_system': bool(self.det_system)
+            },
+            metadata={
+                'component_type': 'DeepTreeEcho',
+                'initialization_mode': 'standardized'
+            }
+        )
+    
+    def process_echo_request(self, input_data: Any, **kwargs) -> Any:
+        """
+        Process requests through standardized Echo component interface
+        
+        Args:
+            input_data: Content to process (string) or processing request (dict)
+            **kwargs: Additional processing parameters
+        
+        Returns:
+            EchoResponse with processing results (if standardized available)
+        """
+        try:
+            if isinstance(input_data, str):
+                # Simple content processing - create tree and propagate
+                if not self.root:
+                    self.create_tree(input_data)
+                else:
+                    # Add as child to existing tree
+                    if self.root and self.root.children:
+                        parent = self.root.children[-1]  # Add to last child
+                    else:
+                        parent = self.root
+                    self.add_child(parent, input_data)
+                
+                # Propagate echoes
+                self.propagate_echoes()
+                
+                # Get analysis
+                analysis = self.analyze_echo_patterns()
+                
+                result_data = {
+                    'content_processed': input_data,
+                    'tree_created': self.root is not None,
+                    'echo_analysis': analysis,
+                    'node_count': len(self._collect_all_nodes(self.root)) if self.root else 0
+                }
+                
+                message = f"Content processed and added to Deep Tree Echo system"
+                
+            elif isinstance(input_data, dict):
+                request_type = input_data.get('type', 'process_content')
+                
+                if request_type == 'analyze_patterns':
+                    analysis = self.analyze_echo_patterns()
+                    result_data = analysis
+                    message = "Echo pattern analysis completed"
+                    
+                elif request_type == 'introspection':
+                    repository_root = input_data.get('repository_root', None)
+                    if repository_root:
+                        repository_root = Path(repository_root)
+                    prompt = self.perform_recursive_introspection(repository_root)
+                    result_data = {
+                        'introspection_prompt': prompt,
+                        'prompt_length': len(prompt) if prompt else 0,
+                        'repository_root': str(repository_root) if repository_root else None
+                    }
+                    message = "Recursive introspection completed"
+                    
+                elif request_type == 'membrane_status':
+                    status = self.get_membrane_status()
+                    result_data = status
+                    message = "Membrane system status retrieved"
+                    
+                elif request_type == 'spatial_update':
+                    self.apply_spatial_dynamics()
+                    result_data = {'spatial_update': 'completed'}
+                    message = "Spatial dynamics updated"
+                    
+                else:
+                    # Default: process as content
+                    content = input_data.get('content', str(input_data))
+                    return self.process_echo_request(content, **kwargs)
+            
+            else:
+                result_data = {'error': f'Unsupported input type: {type(input_data)}'}
+                message = f"Unsupported input type: {type(input_data)}"
+                success = False
+            
+            if ECHO_STANDARDIZED_AVAILABLE and 'error' not in result_data:
+                return EchoResponse(
+                    success=True,
+                    data=result_data,
+                    message=message,
+                    metadata={
+                        'echo_threshold': self.echo_threshold,
+                        'max_depth': self.max_depth,
+                        'processing_type': request_type if isinstance(input_data, dict) else 'content'
+                    }
+                )
+            elif ECHO_STANDARDIZED_AVAILABLE:
+                return EchoResponse(
+                    success=False,
+                    message=message,
+                    data=result_data
+                )
+            else:
+                return result_data
+                
+        except Exception as e:
+            error_msg = f"Error processing request: {str(e)}"
+            self.logger.error(error_msg, exc_info=True)
+            
+            if ECHO_STANDARDIZED_AVAILABLE:
+                # Standardized error response
+                return EchoResponse(
+                    success=False,
+                    message=error_msg,
+                    metadata={'error_type': type(e).__name__}
+                )
+            else:
+                return {'error': error_msg}
+    
+    def echo_operation(self, data: Any, echo_value: float = 0.0) -> Any:
+        """
+        Perform echo operation with specified echo value
+        
+        Args:
+            data: Data to echo through the system
+            echo_value: Echo intensity/strength
+        
+        Returns:
+            EchoResponse with echo results (if standardized available)
+        """
+        try:
+            # Process the data first
+            if isinstance(data, str) and not self.root:
+                self.create_tree(data)
+            elif isinstance(data, str) and self.root:
+                # Add content as new node
+                new_node = self.add_child(self.root, data)
+                # Apply direct echo injection with specified value
+                self.inject_echo(self.root, new_node, strength=echo_value)
+            
+            # Apply echo value influence
+            if self.root and echo_value > 0.0:
+                # Update echo values based on provided echo_value
+                self._update_echo_with_value(self.root, echo_value)
+                
+                # Propagate with enhanced strength
+                original_threshold = self.echo_threshold
+                self.echo_threshold = max(0.1, self.echo_threshold - (echo_value * 0.3))
+                self.propagate_echoes()
+                self.echo_threshold = original_threshold
+            
+            # Get enhanced analysis
+            analysis = self.analyze_echo_patterns()
+            
+            echo_data = {
+                'original_data': data,
+                'echo_value': echo_value,
+                'echo_analysis': analysis,
+                'tree_state': {
+                    'node_count': len(self._collect_all_nodes(self.root)) if self.root else 0,
+                    'max_echo': analysis.get('max_echo_value', 0.0),
+                    'avg_echo': analysis.get('avg_echo_value', 0.0)
+                },
+                'membrane_activity': self.get_membrane_status() if self.membrane_manager else None
+            }
+            
+            if ECHO_STANDARDIZED_AVAILABLE:
+                return EchoResponse(
+                    success=True,
+                    data=echo_data,
+                    message=f"Echo operation completed (value: {echo_value})",
+                    metadata={
+                        'echo_value': echo_value,
+                        'tree_depth': analysis.get('max_depth', 0),
+                        'node_count': echo_data['tree_state']['node_count']
+                    }
+                )
+            else:
+                return echo_data
+                
+        except Exception as e:
+            error_msg = f"Error in echo operation: {str(e)}"
+            self.logger.error(error_msg, exc_info=True)
+            
+            if ECHO_STANDARDIZED_AVAILABLE:
+                return EchoResponse(
+                    success=False,
+                    message=error_msg,
+                    metadata={'error_type': type(e).__name__, 'echo_value': echo_value}
+                )
+            else:
+                return {'error': error_msg, 'echo_value': echo_value}
+    
+    def _update_echo_with_value(self, node: TreeNode, echo_value: float):
+        """Update node echo values based on provided echo_value"""
+        if node:
+            # Blend existing echo with new echo value
+            node.echo_value = min(2.0, node.echo_value + echo_value)
+            
+            # Recursively update children with diminishing echo
+            for child in node.children:
+                self._update_echo_with_value(child, echo_value * 0.8)
+
+
+# Factory function for standardized component creation
+def create_deep_tree_echo_standardized(echo_threshold: float = 0.75,
+                                     max_depth: int = 10,
+                                     use_julia: bool = True,
+                                     component_name: str = "DeepTreeEcho",
+                                     version: str = "1.0.0") -> 'DeepTreeEcho':
+    """
+    Create and initialize a DeepTreeEcho system with standardized Echo component interface
+    """
+    # Create the system
+    system = DeepTreeEcho(echo_threshold=echo_threshold, max_depth=max_depth, use_julia=use_julia)
+    
+    # Initialize with standardized interface if available
+    if ECHO_STANDARDIZED_AVAILABLE:
+        config = EchoConfig(
+            component_name=component_name,
+            version=version,
+            echo_threshold=echo_threshold,
+            max_depth=max_depth,
+            debug_mode=False
+        )
+        
+        result = system.initialize_echo_component(config)
+        if hasattr(result, 'success') and not result.success:
+            raise RuntimeError(f"Failed to initialize DeepTreeEcho as standardized component: {result.message}")
+    
+    return system
