@@ -7,11 +7,9 @@ Demonstrates the enhanced unified symbolic reasoning capabilities
 of the Deep Tree Echo cognitive architecture.
 """
 
-import json
 from cognitive_grammar_bridge import (
     get_cognitive_grammar_bridge, 
-    SymbolicExpression, 
-    NeuralPattern
+    SymbolicExpression
 )
 
 def demonstrate_unified_reasoning():
@@ -119,7 +117,7 @@ def demonstrate_unified_reasoning():
     
     # Self-reflection
     reflection = bridge.reflect("learning_process", depth=2)
-    print(f"  💭 Reflection on 'learning_process':")
+    print("  💭 Reflection on 'learning_process':")
     print(f"     Insights: {len(reflection['insights'])} generated")
     print(f"     Recommendations: {', '.join(reflection['recommendations'][:2])}")
     
