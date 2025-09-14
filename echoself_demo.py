@@ -10,6 +10,8 @@ import json
 import logging
 import time
 from pathlib import Path
+from datetime import datetime
+from typing import Any, Dict, Optional
 from cognitive_architecture import CognitiveArchitecture
 
 
@@ -21,9 +23,123 @@ def setup_logging():
     )
 
 
+# Global state for echo functionality
+_global_cognitive_system: Optional[CognitiveArchitecture] = None
+_global_demo_state = {
+    'cycles_completed': 0,
+    'introspection_results': [],
+    'initialized': False,
+    'last_update': None
+}
+
+
+def echo(data: Any = None, echo_value: float = 0.0) -> Dict[str, Any]:
+    """
+    Echo function for Echoself demo - provides unified interface
+    
+    Returns current demonstration state with echo characteristics.
+    This function implements the standardized echo interface pattern
+    for integration with the unified Deep Tree Echo architecture.
+    
+    Args:
+        data: Input data (optional, for compatibility)
+        echo_value: Echo strength value (0.0 to 1.0)
+    
+    Returns:
+        Dict containing current demo state and echo information
+    """
+    global _global_demo_state, _global_cognitive_system
+    
+    try:
+        echoed_data = {
+            'demo_state': {
+                'cycles_completed': _global_demo_state['cycles_completed'],
+                'introspection_results_count': len(_global_demo_state['introspection_results']),
+                'cognitive_system_available': _global_cognitive_system is not None,
+                'initialized': _global_demo_state['initialized'],
+                'echoself_introspection_available': (
+                    _global_cognitive_system is not None and 
+                    hasattr(_global_cognitive_system, 'echoself_introspection') and
+                    _global_cognitive_system.echoself_introspection is not None
+                )
+            },
+            'echo_value': echo_value,
+            'recent_results': _global_demo_state['introspection_results'][-3:],
+            'timestamp': datetime.now().isoformat(),
+            'component_type': 'echoself_demo',
+            'integration_status': 'active'
+        }
+        
+        # Update last accessed time
+        _global_demo_state['last_update'] = datetime.now().isoformat()
+        
+        return {
+            'success': True,
+            'data': echoed_data,
+            'message': f"Echoself demo echo (value: {echo_value}, cycles: {_global_demo_state['cycles_completed']})",
+            'metadata': {
+                'echo_value': echo_value,
+                'cycles_completed': _global_demo_state['cycles_completed'],
+                'function_type': 'echo'
+            }
+        }
+        
+    except Exception as e:
+        return {
+            'success': False,
+            'data': None,
+            'message': f"Echo function error: {str(e)}",
+            'metadata': {
+                'error': str(e),
+                'function_type': 'echo'
+            }
+        }
+
+
+def create_echoself_demo_system() -> Optional[CognitiveArchitecture]:
+    """
+    Create and initialize an Echoself demo system
+    
+    Factory function that creates a cognitive architecture instance
+    configured for Echoself demonstration. This provides a standardized
+    way to create the demo system for integration with other components.
+    
+    Returns:
+        CognitiveArchitecture instance if successful, None if failed
+    """
+    global _global_cognitive_system, _global_demo_state
+    
+    try:
+        # Try to initialize cognitive architecture
+        cognitive_system = CognitiveArchitecture()
+        
+        # Check if echoself introspection is available - it's optional for echo functionality
+        if hasattr(cognitive_system, 'echoself_introspection') and cognitive_system.echoself_introspection:
+            logging.info("Echoself introspection system available")
+        else:
+            logging.warning("Echoself introspection system not available, echo functions will work with limited functionality")
+        
+        # Update global state
+        _global_cognitive_system = cognitive_system
+        _global_demo_state['initialized'] = True
+        _global_demo_state['last_update'] = datetime.now().isoformat()
+        
+        logging.info("Echoself demo system created successfully")
+        return cognitive_system
+        
+    except Exception as e:
+        logging.error(f"Failed to create Echoself demo system: {e}")
+        # Even if CognitiveArchitecture fails, we can still provide echo functionality
+        _global_demo_state['initialized'] = False
+        _global_demo_state['last_update'] = datetime.now().isoformat()
+        return None
+
+
 def demonstrate_introspection_cycle(cognitive_system: CognitiveArchitecture, 
                                    cycle_num: int):
     """Demonstrate a single introspection cycle"""
+    global _global_demo_state
+    
     print(f"\n{'='*60}")
     print(f"RECURSIVE INTROSPECTION CYCLE {cycle_num}")
     print(f"{'='*60}")
@@ -45,6 +161,14 @@ def demonstrate_introspection_cycle(cognitive_system: CognitiveArchitecture,
         print(f"📝 Generated prompt length: {len(prompt)} characters")
         print("📝 Prompt preview (first 300 chars):")
         print(f"   {prompt[:300]}...")
+        
+        # Store result in global state
+        _global_demo_state['introspection_results'].append({
+            'cycle': cycle_num,
+            'timestamp': datetime.now().isoformat(),
+            'prompt_length': len(prompt),
+            'processing_time': introspection_time
+        })
     else:
         print("❌ No introspection prompt generated")
         return
@@ -72,6 +196,9 @@ def demonstrate_introspection_cycle(cognitive_system: CognitiveArchitecture,
     
     if len(goals) > 5:
         print(f"   ... and {len(goals) - 5} more goals")
+    
+    # Update global cycle counter
+    _global_demo_state['cycles_completed'] = cycle_num
 
 
 def demonstrate_adaptive_attention(cognitive_system: CognitiveArchitecture):
@@ -185,21 +312,26 @@ def demonstrate_neural_symbolic_synergy(cognitive_system: CognitiveArchitecture)
 
 def main():
     """Main demonstration function"""
+    global _global_cognitive_system, _global_demo_state
+    
     setup_logging()
     
     print("🌳 ECHOSELF RECURSIVE SELF-MODEL INTEGRATION DEMONSTRATION 🌳")
     print("Implementing hypergraph encoding and adaptive attention allocation")
     print("Inspired by DeepTreeEcho/Eva Self Model architecture")
     
-    # Initialize cognitive architecture
+    # Initialize cognitive architecture using factory function
     print("\n🚀 Initializing cognitive architecture with Echoself introspection...")
-    cognitive_system = CognitiveArchitecture()
+    cognitive_system = create_echoself_demo_system()
     
-    if not cognitive_system.echoself_introspection:
-        print("❌ Echoself introspection system not available!")
+    if not cognitive_system:
+        print("❌ Failed to create Echoself introspection system!")
         return
     
     print("✅ Echoself introspection system initialized successfully!")
+    
+    # Store the system globally for echo function access
+    _global_cognitive_system = cognitive_system
     
     try:
         # Demonstrate core introspection cycles
@@ -225,7 +357,21 @@ def main():
         print("  ✅ Neural-symbolic synergy through recursive feedback")
         print("  ✅ Integration with cognitive architecture")
         print("  ✅ Comprehensive test coverage")
+        print("  ✅ Echo function integration for unified interface")
         print(f"{'='*60}")
+        
+        # Demonstrate echo functionality
+        print("\n🔄 ECHO FUNCTION DEMONSTRATION")
+        print("Testing unified interface integration...")
+        echo_result = echo(echo_value=0.8)
+        if echo_result['success']:
+            print("✅ Echo function working correctly")
+            demo_state = echo_result['data']['demo_state']
+            print(f"   Cycles completed: {demo_state['cycles_completed']}")
+            print(f"   Introspection results: {demo_state['introspection_results_count']}")
+            print(f"   System initialized: {demo_state['initialized']}")
+        else:
+            print(f"❌ Echo function error: {echo_result['message']}")
         
     except Exception as e:  # pylint: disable=broad-exception-caught
         # Broad exception catching is appropriate here as a safety net for the demo
