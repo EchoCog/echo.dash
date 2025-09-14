@@ -176,12 +176,22 @@ class SeleniumInterface:
                     query: async () => { return { state: 'granted', onchange: null }; }
                 };
                 
-                // Add fake canvas fingerprinting
+                // Canvas fingerprint protection - real implementation
                 const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
                 HTMLCanvasElement.prototype.toDataURL = function(type) {
-                    if (window.canvas_fingerprint_warned) return originalToDataURL.apply(this, arguments);
+                    // Deep Tree Echo canvas protection: Add noise to prevent fingerprinting
                     const canvas = this;
-                    window.canvas_fingerprint_warned = true;
+                    const context = canvas.getContext('2d');
+                    if (context && canvas.width > 0 && canvas.height > 0) {
+                        // Add minimal entropy while preserving functionality
+                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = imageData.data;
+                        for (let i = 0; i < data.length; i += 4) {
+                            // Add imperceptible noise to red channel only
+                            data[i] = Math.min(255, data[i] + (Math.random() < 0.01 ? 1 : 0));
+                        }
+                        context.putImageData(imageData, 0, 0);
+                    }
                     return originalToDataURL.apply(canvas, arguments);
                 };
             """)
