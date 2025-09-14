@@ -110,12 +110,14 @@ def create_echoself_demo_system() -> Optional[CognitiveArchitecture]:
     global _global_cognitive_system, _global_demo_state
     
     try:
-        # Initialize cognitive architecture
+        # Try to initialize cognitive architecture
         cognitive_system = CognitiveArchitecture()
         
-        if not cognitive_system.echoself_introspection:
-            logging.error("Echoself introspection system not available")
-            return None
+        # Check if echoself introspection is available - it's optional for echo functionality
+        if hasattr(cognitive_system, 'echoself_introspection') and cognitive_system.echoself_introspection:
+            logging.info("Echoself introspection system available")
+        else:
+            logging.warning("Echoself introspection system not available, echo functions will work with limited functionality")
         
         # Update global state
         _global_cognitive_system = cognitive_system
@@ -127,6 +129,9 @@ def create_echoself_demo_system() -> Optional[CognitiveArchitecture]:
         
     except Exception as e:
         logging.error(f"Failed to create Echoself demo system: {e}")
+        # Even if CognitiveArchitecture fails, we can still provide echo functionality
+        _global_demo_state['initialized'] = False
+        _global_demo_state['last_update'] = datetime.now().isoformat()
         return None
 
 

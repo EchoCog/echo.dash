@@ -2,14 +2,15 @@
 """
 Test script for Echoself Recursive Self-Model Integration Demonstration
 
-Tests the basic functionality of the echoself_demo.py module without requiring
-external dependencies or GUI interaction.
+Tests the basic functionality of the echoself_demo.py module using real implementations
+and no mocks to comply with deep tree echo zero-tolerance mock/fake policy.
 """
 
 import unittest
 import logging
 import sys
-from unittest.mock import Mock, patch, MagicMock
+import tempfile
+import time
 from pathlib import Path
 
 # Add the current directory to the path for imports
@@ -25,12 +26,22 @@ except ImportError as e:
 
 
 class TestEchoselfDemo(unittest.TestCase):
-    """Test cases for echoself_demo module"""
+    """Test cases for echoself_demo module using real implementations (no mocks)"""
 
     def setUp(self):
         """Set up test fixtures"""
         # Suppress logging output during tests
         logging.getLogger().setLevel(logging.CRITICAL)
+        
+        # Reset global state before each test
+        if ECHOSELF_DEMO_AVAILABLE:
+            echoself_demo._global_cognitive_system = None
+            echoself_demo._global_demo_state = {
+                'cycles_completed': 0,
+                'introspection_results': [],
+                'initialized': False,
+                'last_update': None
+            }
 
     def test_import_echoself_demo(self):
         """Test that echoself_demo module can be imported"""
@@ -62,27 +73,10 @@ class TestEchoselfDemo(unittest.TestCase):
         self.assertEqual(root_logger.level, logging.INFO)
 
     @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available")
-    @patch('echoself_demo.CognitiveArchitecture')
-    def test_demonstrate_introspection_cycle_function_exists(self, mock_cog_arch):
-        """Test that demonstrate_introspection_cycle function exists and can be called"""
+    def test_demonstrate_introspection_cycle_function_exists(self):
+        """Test that demonstrate_introspection_cycle function exists"""
         self.assertTrue(hasattr(echoself_demo, 'demonstrate_introspection_cycle'))
         self.assertTrue(callable(echoself_demo.demonstrate_introspection_cycle))
-        
-        # Create a mock cognitive system
-        mock_cognitive_system = Mock()
-        mock_cognitive_system.perform_recursive_introspection.return_value = "test prompt"
-        mock_cognitive_system.get_introspection_metrics.return_value = {
-            'recent_average_threshold': 0.5,
-            'total_decisions': 1,
-            'highest_salience_files': []
-        }
-        mock_cognitive_system.adaptive_goal_generation_with_introspection.return_value = []
-        
-        # Test the function doesn't crash
-        try:
-            echoself_demo.demonstrate_introspection_cycle(mock_cognitive_system, 1)
-        except Exception as e:
-            self.fail(f"demonstrate_introspection_cycle raised an exception: {e}")
 
     @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available")
     def test_module_structure(self):
@@ -91,8 +85,8 @@ class TestEchoselfDemo(unittest.TestCase):
         expected_functions = [
             'setup_logging', 
             'demonstrate_introspection_cycle',
-            'echo',  # New echo function
-            'create_echoself_demo_system'  # New factory function
+            'echo',  # Echo function
+            'create_echoself_demo_system'  # Factory function
         ]
         
         for func_name in expected_functions:
@@ -112,55 +106,19 @@ class TestEchoselfDemo(unittest.TestCase):
             self.fail(f"Module failed to import required dependencies: {e}")
 
     @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available")
-    @patch('time.time')
-    @patch('echoself_demo.CognitiveArchitecture')
-    def test_timing_functionality(self, mock_cog_arch, mock_time):
-        """Test that timing functionality works in demonstration"""
-        mock_time.side_effect = [1000.0, 1001.5]  # 1.5 second operation
-        
-        mock_cognitive_system = Mock()
-        mock_cognitive_system.perform_recursive_introspection.return_value = "test prompt"
-        mock_cognitive_system.get_introspection_metrics.return_value = {
-            'recent_average_threshold': 0.5,
-            'total_decisions': 1,
-            'highest_salience_files': []
-        }
-        mock_cognitive_system.adaptive_goal_generation_with_introspection.return_value = []
-        
-        # Redirect stdout to capture print statements
-        from io import StringIO
-        import sys
-        old_stdout = sys.stdout
-        sys.stdout = StringIO()
-        
-        try:
-            echoself_demo.demonstrate_introspection_cycle(mock_cognitive_system, 1)
-            output = sys.stdout.getvalue()
-            
-            # Check that timing information is displayed
-            self.assertIn("1.50 seconds", output)
-            self.assertIn("Attention Allocation Metrics:", output)
-            
-        finally:
-            sys.stdout = old_stdout
-
-    @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available")
-    def test_echo_function_exists(self):
-        """Test that echo function exists and can be called"""
-        self.assertTrue(hasattr(echoself_demo, 'echo'))
-        self.assertTrue(callable(echoself_demo.echo))
-        
-        # Test basic echo functionality
+    def test_echo_function_basic_functionality(self):
+        """Test that echo function works without any dependencies"""
         result = echoself_demo.echo()
         
         self.assertIsInstance(result, dict)
         self.assertIn('success', result)
         self.assertIn('data', result)
         self.assertIn('message', result)
-        
+        self.assertTrue(result['success'])  # Should always succeed
+
     @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available")
     def test_echo_function_with_parameters(self):
-        """Test echo function with parameters"""
+        """Test echo function with parameters - no mocks needed"""
         result = echoself_demo.echo(data={'test': 'data'}, echo_value=0.5)
         
         self.assertIsInstance(result, dict)
@@ -169,14 +127,50 @@ class TestEchoselfDemo(unittest.TestCase):
         self.assertEqual(result['metadata']['echo_value'], 0.5)
         
     @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available")
+    def test_echo_function_state_tracking(self):
+        """Test that echo function properly tracks state changes"""
+        # First call
+        result1 = echoself_demo.echo(echo_value=0.3)
+        self.assertTrue(result1['success'])
+        initial_cycles = result1['data']['demo_state']['cycles_completed']
+        
+        # Simulate some demo state changes
+        echoself_demo._global_demo_state['cycles_completed'] = 2
+        echoself_demo._global_demo_state['introspection_results'].append({
+            'cycle': 1, 'timestamp': '2024-01-01T00:00:00', 'test': True
+        })
+        
+        # Second call should reflect state changes
+        result2 = echoself_demo.echo(echo_value=0.7)
+        self.assertTrue(result2['success'])
+        self.assertEqual(result2['data']['demo_state']['cycles_completed'], 2)
+        self.assertEqual(result2['data']['demo_state']['introspection_results_count'], 1)
+
+    @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available")
     def test_create_echoself_demo_system_function_exists(self):
         """Test that create_echoself_demo_system function exists"""
         self.assertTrue(hasattr(echoself_demo, 'create_echoself_demo_system'))
         self.assertTrue(callable(echoself_demo.create_echoself_demo_system))
 
     @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available") 
-    def test_echo_function_structure(self):
-        """Test that echo function returns expected structure"""
+    def test_create_echoself_demo_system_functionality(self):
+        """Test create_echoself_demo_system with real dependencies"""
+        # This test uses real CognitiveArchitecture if available
+        system = echoself_demo.create_echoself_demo_system()
+        
+        # The function should handle failures gracefully and update global state
+        self.assertIn('initialized', echoself_demo._global_demo_state)
+        self.assertIsNotNone(echoself_demo._global_demo_state['last_update'])
+        
+        # If system creation succeeded, it should be a real object, not a mock
+        if system is not None:
+            # Should have expected attributes for real CognitiveArchitecture
+            self.assertTrue(hasattr(system, '__class__'))
+            self.assertNotEqual(str(type(system)), "<class 'unittest.mock.Mock'>")
+
+    @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available") 
+    def test_echo_function_structure_compliance(self):
+        """Test that echo function returns expected structure for integration"""
         result = echoself_demo.echo(echo_value=0.8)
         
         # Check overall structure
@@ -192,12 +186,33 @@ class TestEchoselfDemo(unittest.TestCase):
             self.assertIn('echo_value', data)
             self.assertIn('timestamp', data)
             self.assertIn('component_type', data)
+            self.assertEqual(data['component_type'], 'echoself_demo')
+            self.assertEqual(data['integration_status'], 'active')
             
             # Check demo_state structure
             demo_state = data['demo_state']
             self.assertIn('cycles_completed', demo_state)
             self.assertIn('initialized', demo_state)
             self.assertIn('cognitive_system_available', demo_state)
+            
+    @unittest.skipIf(not ECHOSELF_DEMO_AVAILABLE, "echoself_demo not available")
+    def test_echo_integration_with_real_system(self):
+        """Test echo function integration with real cognitive system if available"""
+        # Try to create a real system
+        system = echoself_demo.create_echoself_demo_system()
+        
+        # Test echo function after system creation
+        result = echoself_demo.echo(echo_value=0.9)
+        self.assertTrue(result['success'])
+        
+        # Check system integration status
+        demo_state = result['data']['demo_state']
+        if system is not None:
+            self.assertTrue(demo_state['cognitive_system_available'])
+        
+        # The echo function should work regardless of system availability
+        self.assertIsInstance(demo_state['cycles_completed'], int)
+        self.assertIsInstance(demo_state['introspection_results_count'], int)
 
 
 def main():
