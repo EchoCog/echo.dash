@@ -7,8 +7,6 @@ and the existing cognitive architecture framework.
 
 import unittest
 import tempfile
-import json
-from pathlib import Path
 from echo9ml_integration import EnhancedCognitiveArchitecture, create_enhanced_cognitive_architecture
 from cognitive_architecture import MemoryType
 
@@ -88,12 +86,11 @@ class TestEcho9mlIntegration(unittest.TestCase):
         initial_interactions = self.enhanced_arch.echo9ml_system.interaction_count
         
         # Process goal
-        goal_id = self.enhanced_arch.enhanced_goal_processing(
+        self.enhanced_arch.enhanced_goal_processing(
             goal_description, priority
         )
         
         # Check goal was added to traditional system
-        goals_with_id = [g for g in self.enhanced_arch.goals if hasattr(g, 'id') and g.id == goal_id]
         self.assertGreater(len(self.enhanced_arch.goals), 0)
         
         # Check Echo9ml system processed the goal
@@ -156,10 +153,6 @@ class TestEcho9mlIntegration(unittest.TestCase):
         )
         self.enhanced_arch.enhanced_goal_processing("Persistent goal", 0.7)
         
-        # Get initial state
-        initial_state = self.enhanced_arch.get_enhanced_cognitive_state()
-        initial_interactions = initial_state["echo9ml"]["system_stats"]["interaction_count"]
-        
         # Save state
         self.enhanced_arch.save_enhanced_state()
         
@@ -201,16 +194,14 @@ class TestEcho9mlIntegration(unittest.TestCase):
     
     def test_trait_synchronization(self):
         """Test personality trait synchronization between systems"""
-        # Modify traditional personality traits
-        self.enhanced_arch.personality_traits["creativity"].current_value = 0.95
-        self.enhanced_arch.personality_traits["analytical"].current_value = 0.85
-        
-        # Force re-synchronization
-        self.enhanced_arch._sync_personality_traits()
-        
-        # Check Echo9ml traits were influenced by traditional traits
-        echo_system = self.enhanced_arch.echo9ml_system
         from echo9ml import PersonaTraitType
+        
+        # Update traits through the public API which triggers synchronization
+        self.enhanced_arch.enhanced_personality_update("creativity", 0.95, {"test": "sync"})
+        self.enhanced_arch.enhanced_personality_update("analytical", 0.85, {"test": "sync"})
+        
+        # Check Echo9ml traits were influenced by the updates
+        echo_system = self.enhanced_arch.echo9ml_system
         
         # Creativity should be influenced
         creativity_trait = echo_system.persona_kernel.traits[PersonaTraitType.CANOPY]
@@ -243,8 +234,6 @@ class TestIntegrationScenarios(unittest.TestCase):
             ("Solve complex ML problem", MemoryType.EPISODIC, 0.9),
             ("Plan advanced ML project", MemoryType.INTENTIONAL, 0.8)
         ]
-        
-        initial_reasoning = list(self.arch.echo9ml_system.persona_kernel.traits.values())[0]  # Get any trait as reference
         
         for step_content, memory_type, importance in learning_steps:
             # Store memory
