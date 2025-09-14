@@ -2,6 +2,10 @@
 """
 ARCHIVED LEGACY VERSION - cronbot-v2.py
 
+🚨 DEEP TREE ECHO ZERO TOLERANCE POLICY ENFORCEMENT 🚨
+This archived file contains mock implementations that violate policy.
+Execution and import are blocked to prevent accidental usage.
+
 ⚠️  WARNING: This is an archived legacy version that has been superseded.
     Current production version: ../../cronbot.py
 
@@ -11,6 +15,27 @@ Deep Tree Echo Zero Tolerance Policy for production code.
 
 For active cronbot functionality, use: ../../cronbot.py
 """
+
+# ARCHIVE PROTECTION: Prevent accidental execution of legacy mock code
+import sys
+import warnings
+
+def _deep_tree_echo_archive_guard():
+    """Deep Tree Echo Zero Tolerance Policy enforcement for archived code"""
+    warnings.warn(
+        "🚨 DEEP TREE ECHO ZERO TOLERANCE VIOLATION 🚨\n"
+        "This archived file contains mock implementations.\n" 
+        "Use production implementation: ../../cronbot.py",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    if __name__ == "__main__":
+        print("🚨 EXECUTION BLOCKED: Deep Tree Echo Zero Tolerance Policy")
+        print("   Archived mock implementations cannot be executed")
+        print("   Use: python ../../cronbot.py")
+        sys.exit(1)
+
+_deep_tree_echo_archive_guard()
 
 # ARCHIVED IMPLEMENTATION - DO NOT USE IN PRODUCTION
 import json
