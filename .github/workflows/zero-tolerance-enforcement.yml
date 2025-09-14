@@ -12,6 +12,9 @@ on:
 jobs:
   scan-for-violations:
     name: Scan for Mock/Fake Implementations
+    permissions:
+      contents: read
+      issues: write
     runs-on: ubuntu-latest
     
     steps:
