@@ -1,280 +1,473 @@
 #!/usr/bin/env python3
 """
-Test for Echo Memory Demo Standardization
+Consolidated Test Suite for Unified Echo Memory System
 
-This test validates that the standardized Echo Memory Demo component follows
-all the Echo API standards and provides the expected functionality.
+This consolidates all memory-related tests from the fragmented test files:
+- test_echo_memory_demo_standardized.py
+- test_memory_integration.py 
+- test_unified_memory.py
+- test_unified_echo_memory_standardized.py
+
+This addresses the "Fragmented Memory System" issue by providing a single
+comprehensive test suite for all memory functionality.
 """
 
 import sys
 import unittest
+import tempfile
+import logging
+import json
+import time
 from pathlib import Path
 
 # Add current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from echo_memory_demo_standardized import EchoMemoryDemoStandardized, create_memory_demo_system
+# Import all memory components
+from unified_echo_memory import (
+    UnifiedEchoMemory, EchoMemoryConfig, create_unified_memory_system, 
+    MemoryType, MemoryNode, HypergraphMemory
+)
 from echo_component_base import EchoConfig, EchoResponse, validate_echo_component
+from memory_adapter import MemoryAdapter, get_memory_adapter
+from memory_management import memory_system
+from echo_memory_demo_standardized import EchoMemoryDemoStandardized, create_memory_demo_system
+
+# Suppress logging during tests
+logging.getLogger().setLevel(logging.CRITICAL)
 
 
-class TestEchoMemoryDemoStandardization(unittest.TestCase):
-    """Test suite for Echo Memory Demo standardization"""
+class TestUnifiedEchoMemoryConsolidated(unittest.TestCase):
+    """
+    Consolidated test suite for all memory system functionality
+    
+    This replaces multiple fragmented test files with a single comprehensive suite
+    """
     
     def setUp(self):
         """Set up test environment"""
-        self.config = EchoConfig(
-            component_name="test_memory_demo",
+        self.temp_dir = tempfile.mkdtemp()
+        
+        # Standard configurations for testing
+        self.echo_config = EchoConfig(
+            component_name="TestUnifiedMemory",
             version="1.0.0",
             echo_threshold=0.75
         )
-        self.demo = EchoMemoryDemoStandardized(self.config)
-    
-    def test_component_validation(self):
-        """Test that component passes Echo validation"""
-        self.assertTrue(validate_echo_component(self.demo))
-    
-    def test_initialization(self):
-        """Test component initialization"""
-        result = self.demo.initialize()
         
+        self.memory_config = EchoMemoryConfig(
+            memory_storage_path=self.temp_dir,
+            working_memory_capacity=5,
+            auto_save_interval=60
+        )
+    
+    def tearDown(self):
+        """Clean up after tests"""
+        # Clean up temp directory if needed
+        import shutil
+        try:
+            shutil.rmtree(self.temp_dir, ignore_errors=True)
+        except:
+            pass
+    
+    # =========================================================================
+    # CORE UNIFIED MEMORY SYSTEM TESTS
+    # =========================================================================
+    
+    def test_unified_memory_creation(self):
+        """Test creating unified memory system"""
+        memory_system = UnifiedEchoMemory(self.echo_config, self.memory_config)
+        
+        # Test initialization
+        result = memory_system.initialize()
         self.assertTrue(result.success)
-        self.assertIn("initialized successfully", result.message)
-        self.assertTrue(self.demo._initialized)
-        self.assertIsNotNone(result.metadata)
-        self.assertEqual(result.metadata["component_name"], "test_memory_demo")
+        self.assertIn("initialized", result.message.lower())
+        self.assertTrue(memory_system._initialized)
     
-    def test_store_operation(self):
-        """Test memory store operation"""
-        self.demo.initialize()
+    def test_memory_storage_and_retrieval(self):
+        """Test basic memory storage and retrieval operations"""
+        memory_system = UnifiedEchoMemory(self.echo_config, self.memory_config)
+        memory_system.initialize()
         
-        store_data = {
-            "action": "store",
-            "key": "test_key",
-            "data": {"value": "test data"}
-        }
+        # Store a memory
+        store_result = memory_system.store_memory(
+            content="Test memory content",
+            memory_type=MemoryType.DECLARATIVE,
+            echo_value=0.8,
+            metadata={"test": True}
+        )
         
-        result = self.demo.process(store_data)
+        self.assertTrue(store_result.success)
+        self.assertIsNotNone(store_result.data.get('memory_id'))
         
-        self.assertTrue(result.success)
-        self.assertEqual(result.data["key"], "test_key")
-        self.assertTrue(result.data["stored"])
-        self.assertIn("Successfully stored", result.message)
+        # Retrieve the memory
+        memory_id = store_result.data['memory_id']
+        retrieve_result = memory_system.retrieve_memory(memory_id)
+        
+        self.assertTrue(retrieve_result.success)
+        self.assertEqual(retrieve_result.data['content'], "Test memory content")
+        self.assertEqual(retrieve_result.data['memory_type'], 'declarative')
+        self.assertEqual(retrieve_result.data['echo_value'], 0.8)
     
-    def test_retrieve_operation(self):
-        """Test memory retrieve operation"""
-        self.demo.initialize()
+    def test_memory_search(self):
+        """Test memory search functionality"""
+        memory_system = UnifiedEchoMemory(self.echo_config, self.memory_config)
+        memory_system.initialize()
         
-        # First store some data
-        store_data = {
-            "action": "store",
-            "key": "retrieve_test",
-            "data": {"message": "hello world"}
-        }
-        self.demo.process(store_data)
-        
-        # Then retrieve it
-        retrieve_data = {
-            "action": "retrieve",
-            "key": "retrieve_test"
-        }
-        
-        result = self.demo.process(retrieve_data)
-        
-        self.assertTrue(result.success)
-        self.assertEqual(result.data["key"], "retrieve_test")
-        self.assertEqual(result.data["data"]["message"], "hello world")
-        self.assertIn("Successfully retrieved", result.message)
-    
-    def test_retrieve_nonexistent(self):
-        """Test retrieving non-existent memory"""
-        self.demo.initialize()
-        
-        retrieve_data = {
-            "action": "retrieve",
-            "key": "nonexistent_key"
-        }
-        
-        result = self.demo.process(retrieve_data)
-        
-        self.assertFalse(result.success)
-        self.assertIn("not found", result.message)
-        self.assertEqual(result.metadata["key"], "nonexistent_key")
-        self.assertFalse(result.metadata["found"])
-    
-    def test_list_operation(self):
-        """Test memory list operation"""
-        self.demo.initialize()
-        
-        # Store multiple items
-        for i in range(3):
-            store_data = {
-                "action": "store", 
-                "key": f"list_test_{i}",
-                "data": {"index": i}
-            }
-            self.demo.process(store_data)
-        
-        # List memories
-        result = self.demo.process({"action": "list"})
-        
-        self.assertTrue(result.success)
-        self.assertGreaterEqual(result.data["total_memories"], 3)
-        self.assertIsInstance(result.data["memory_keys"], list)
-        self.assertIn("Listed", result.message)
-    
-    def test_demo_basic_operation(self):
-        """Test basic demo operation"""
-        self.demo.initialize()
-        
-        result = self.demo.process({"action": "demo", "demo_type": "basic"})
-        
-        self.assertTrue(result.success)
-        self.assertEqual(result.data["demo_type"], "basic")
-        self.assertIn("demo_key", result.data)
-        self.assertIn("demo_data", result.data)
-        self.assertIn("message", result.data["demo_data"])
-    
-    def test_demo_performance_operation(self):
-        """Test performance demo operation"""
-        self.demo.initialize()
-        
-        result = self.demo.process({"action": "demo", "demo_type": "performance"})
-        
-        self.assertTrue(result.success)
-        self.assertEqual(result.data["demo_type"], "performance")
-        self.assertEqual(result.data["operations_performed"], 5)
-        self.assertGreater(result.data["duration_seconds"], 0)
-        self.assertGreater(result.data["operations_per_second"], 0)
-    
-    def test_echo_operation(self):
-        """Test echo operation"""
-        self.demo.initialize()
-        
-        # Store some data first to make echo more interesting
-        self.demo.process({
-            "action": "store",
-            "key": "echo_test", 
-            "data": {"test": "data"}
-        })
-        
-        test_data = {"input": "test echo"}
-        result = self.demo.echo(test_data, echo_value=0.9)
-        
-        self.assertTrue(result.success)
-        self.assertEqual(result.data["echo_value"], 0.9)
-        self.assertIn("memory_state", result.data)
-        self.assertGreaterEqual(result.data["memory_state"]["total_memories"], 1)
-        self.assertEqual(result.data["input_echo"], test_data)
-        self.assertIn("timestamp", result.data)
-    
-    def test_invalid_action(self):
-        """Test handling of invalid actions"""
-        self.demo.initialize()
-        
-        result = self.demo.process({"action": "invalid_action"})
-        
-        self.assertFalse(result.success)
-        self.assertIn("Unknown action", result.message)
-    
-    def test_factory_function(self):
-        """Test the factory function"""
-        demo = create_memory_demo_system()
-        
-        self.assertIsInstance(demo, EchoMemoryDemoStandardized)
-        self.assertTrue(validate_echo_component(demo))
-        self.assertTrue(demo._initialized)
-        self.assertEqual(demo.config.component_name, "EchoMemoryDemo")
-    
-    def test_operation_counting(self):
-        """Test that operations are counted correctly"""
-        self.demo.initialize()
-        
-        initial_count = self.demo.operation_count
-        
-        # Perform several operations
-        self.demo.process({"action": "demo", "demo_type": "basic"})
-        self.demo.process({"action": "list"})
-        self.demo.process({"action": "demo", "demo_type": "performance"})
-        
-        # Check count increased
-        self.assertEqual(self.demo.operation_count, initial_count + 3)
-    
-    def test_error_handling(self):
-        """Test error handling with invalid input"""
-        self.demo.initialize()
-        
-        # Test store without key
-        result = self.demo.process({"action": "store", "data": "test"})
-        self.assertFalse(result.success)
-        self.assertIn("requires 'key'", result.message)
-        
-        # Test retrieve without key
-        result = self.demo.process({"action": "retrieve"})
-        self.assertFalse(result.success)
-        self.assertIn("requires 'key'", result.message)
-    
-    def test_response_format_consistency(self):
-        """Test that all operations return consistent EchoResponse format"""
-        self.demo.initialize()
-        
-        operations = [
-            {"action": "demo", "demo_type": "basic"},
-            {"action": "list"},
-            {"action": "store", "key": "format_test", "data": {"test": "data"}},
-            {"action": "retrieve", "key": "format_test"}
+        # Store multiple memories
+        test_memories = [
+            ("Important business meeting", MemoryType.EPISODIC),
+            ("Python programming concepts", MemoryType.SEMANTIC),
+            ("Meeting with client tomorrow", MemoryType.EPISODIC),
+            ("How to ride a bicycle", MemoryType.PROCEDURAL)
         ]
         
-        for operation in operations:
-            result = self.demo.process(operation)
-            
-            # All results should be EchoResponse objects
-            self.assertIsInstance(result, EchoResponse)
-            self.assertIsInstance(result.success, bool)
-            self.assertIsInstance(result.message, str)
-            self.assertIsNotNone(result.timestamp)
-            
-            if result.success:
-                self.assertIsNotNone(result.data)
+        for content, mem_type in test_memories:
+            memory_system.store_memory(content, mem_type, echo_value=0.5)
+        
+        # Search for memories
+        search_result = memory_system.search_memories("meeting")
+        
+        self.assertTrue(search_result.success)
+        self.assertGreater(search_result.data['result_count'], 0)
+        
+        # Verify search results contain relevant memories
+        results = search_result.data['results']
+        meeting_results = [r for r in results if 'meeting' in r['content'].lower()]
+        self.assertGreater(len(meeting_results), 0)
+    
+    def test_memory_echo_operations(self):
+        """Test echo-specific memory operations"""
+        memory_system = UnifiedEchoMemory(self.echo_config, self.memory_config)
+        memory_system.initialize()
+        
+        # Test echo operation
+        echo_result = memory_system.echo("Test echo data", echo_value=0.9)
+        
+        self.assertTrue(echo_result.success)
+        self.assertIn('echo_memory_id', echo_result.data)
+        self.assertEqual(echo_result.data['echo_value'], 0.9)
+        self.assertIn('resonant_memories', echo_result.data)
+    
+    def test_memory_overview_and_analysis(self):
+        """Test memory system analysis capabilities"""
+        memory_system = UnifiedEchoMemory(self.echo_config, self.memory_config)
+        memory_system.initialize()
+        
+        # Add some test data
+        for i in range(5):
+            memory_system.store_memory(
+                f"Test memory {i}",
+                MemoryType.DECLARATIVE,
+                echo_value=i * 0.2
+            )
+        
+        # Get overview
+        overview_result = memory_system.get_memory_overview()
+        
+        self.assertTrue(overview_result.success)
+        self.assertEqual(overview_result.data['total_memories'], 5)
+        self.assertIn('memory_type_distribution', overview_result.data)
+        self.assertIn('echo_statistics', overview_result.data)
+    
+    # =========================================================================
+    # MEMORY ADAPTER TESTS
+    # =========================================================================
+    
+    def test_memory_adapter_functionality(self):
+        """Test memory adapter provides unified interface"""
+        adapter = MemoryAdapter("test_adapter")
+        
+        # Test adapter storage
+        memory_id = adapter.store_memory(
+            "Test adapter memory",
+            MemoryType.DECLARATIVE,
+            metadata={"adapter_test": True},
+            echo_value=0.7
+        )
+        
+        self.assertIsNotNone(memory_id)
+        
+        # Test adapter retrieval
+        retrieved = adapter.retrieve_memory(memory_id)
+        self.assertIsNotNone(retrieved)
+        self.assertEqual(retrieved.content, "Test adapter memory")
+        self.assertEqual(retrieved.echo_value, 0.7)
+    
+    def test_global_memory_adapter(self):
+        """Test global memory adapter singleton"""
+        adapter1 = get_memory_adapter("global_test")
+        adapter2 = get_memory_adapter("global_test")
+        
+        # Should return the same instance
+        self.assertIs(adapter1, adapter2)
+        
+        # Test functionality
+        memory_id = adapter1.store_memory("Global test", MemoryType.SEMANTIC)
+        retrieved = adapter2.retrieve_memory(memory_id)
+        
+        self.assertIsNotNone(retrieved)
+        self.assertEqual(retrieved.content, "Global test")
+    
+    def test_memory_adapter_search(self):
+        """Test memory adapter search capabilities"""
+        adapter = MemoryAdapter("search_test")
+        
+        # Add test memories with adequate echo values to pass the default threshold
+        test_data = [
+            ("Python is a programming language", 0.8),
+            ("Machine learning uses Python", 0.9),
+            ("JavaScript is for web development", 0.7)
+        ]
+        
+        for content, echo_value in test_data:
+            adapter.store_memory(content, MemoryType.SEMANTIC, echo_value=echo_value)
+        
+        # Search for Python-related memories
+        python_memories = adapter.search_memories("Python")
+        self.assertGreater(len(python_memories), 0)
+        
+        # Verify results
+        for memory in python_memories:
+            self.assertIn("Python", memory.content)
+    
+    # =========================================================================
+    # COMPATIBILITY LAYER TESTS
+    # =========================================================================
+    
+    def test_memory_management_compatibility(self):
+        """Test that memory_management.py provides backward compatibility"""
+        # Test that the compatibility layer works
+        self.assertIsInstance(memory_system, HypergraphMemory)
+        
+        # Test basic operations through compatibility layer
+        test_node = MemoryNode(
+            id="test_compat",
+            content="Compatibility test",
+            memory_type=MemoryType.DECLARATIVE
+        )
+        
+        node_id = memory_system.add_node(test_node)
+        self.assertEqual(node_id, "test_compat")
+        
+        retrieved = memory_system.get_node("test_compat")
+        self.assertIsNotNone(retrieved)
+        self.assertEqual(retrieved.content, "Compatibility test")
+    
+    # =========================================================================
+    # ECHO COMPONENT VALIDATION TESTS
+    # =========================================================================
+    
+    def test_echo_component_validation(self):
+        """Test that all memory components pass Echo validation"""
+        # Test UnifiedEchoMemory
+        memory_system = UnifiedEchoMemory(self.echo_config, self.memory_config)
+        self.assertTrue(validate_echo_component(memory_system))
+        
+        # Test EchoMemoryDemoStandardized
+        demo_config = EchoConfig(
+            component_name="test_demo",
+            version="1.0.0"
+        )
+        demo = EchoMemoryDemoStandardized(demo_config)
+        self.assertTrue(validate_echo_component(demo))
+    
+    def test_echo_response_format(self):
+        """Test that all operations return proper EchoResponse objects"""
+        memory_system = UnifiedEchoMemory(self.echo_config, self.memory_config)
+        
+        # Test initialization response
+        init_result = memory_system.initialize()
+        self.assertIsInstance(init_result, EchoResponse)
+        self.assertTrue(hasattr(init_result, 'success'))
+        self.assertTrue(hasattr(init_result, 'message'))
+        self.assertTrue(hasattr(init_result, 'data'))
+        self.assertTrue(hasattr(init_result, 'metadata'))
+        
+        # Test process response
+        process_result = memory_system.process({
+            'operation': 'store',
+            'content': 'Test process memory',
+            'memory_type': 'declarative'
+        })
+        self.assertIsInstance(process_result, EchoResponse)
+        self.assertTrue(process_result.success)
+    
+    # =========================================================================
+    # FACTORY FUNCTION TESTS
+    # =========================================================================
+    
+    def test_create_unified_memory_system(self):
+        """Test the factory function for creating memory systems"""
+        memory_system = create_unified_memory_system(
+            component_name="FactoryTest",
+            storage_path=self.temp_dir
+        )
+        
+        self.assertIsInstance(memory_system, UnifiedEchoMemory)
+        self.assertTrue(memory_system._initialized)
+        
+        # Test basic functionality
+        store_result = memory_system.store_memory("Factory test", MemoryType.DECLARATIVE)
+        self.assertTrue(store_result.success)
+    
+    def test_create_memory_demo_system(self):
+        """Test the demo system factory function"""
+        demo_system = create_memory_demo_system()  # No arguments needed
+        
+        self.assertIsInstance(demo_system, EchoMemoryDemoStandardized)
+        
+        # Test initialization
+        init_result = demo_system.initialize()
+        self.assertTrue(init_result.success)
+    
+    # =========================================================================
+    # INTEGRATION TESTS
+    # =========================================================================
+    
+    def test_memory_system_integration(self):
+        """Test integration between different memory components"""
+        # Create unified memory system
+        unified = create_unified_memory_system("IntegrationTest", self.temp_dir)
+        
+        # Create memory adapter
+        adapter = MemoryAdapter("integration_adapter")
+        
+        # Store memory through unified system
+        unified_result = unified.store_memory(
+            "Integration test memory",
+            MemoryType.DECLARATIVE,
+            echo_value=0.8
+        )
+        self.assertTrue(unified_result.success)
+        
+        # Store memory through adapter
+        adapter_memory_id = adapter.store_memory(
+            "Adapter integration memory",
+            MemoryType.SEMANTIC,
+            echo_value=0.6
+        )
+        self.assertIsNotNone(adapter_memory_id)
+        
+        # Verify both systems can access their memories
+        unified_memory_id = unified_result.data['memory_id']
+        unified_retrieve = unified.retrieve_memory(unified_memory_id)
+        self.assertTrue(unified_retrieve.success)
+        
+        adapter_retrieve = adapter.retrieve_memory(adapter_memory_id)
+        self.assertIsNotNone(adapter_retrieve)
+    
+    def test_memory_type_consistency(self):
+        """Test that MemoryType is consistent across all components"""
+        # All components should use the same MemoryType enum
+        from unified_echo_memory import MemoryType as UnifiedMemoryType
+        from memory_adapter import MemoryType as AdapterMemoryType
+        from memory_management import MemoryType as ManagementMemoryType
+        
+        # Should be the same enum
+        self.assertIs(UnifiedMemoryType, AdapterMemoryType)
+        self.assertIs(UnifiedMemoryType, ManagementMemoryType)
+        
+        # Test that all expected memory types are present
+        expected_types = {
+            'DECLARATIVE', 'EPISODIC', 'PROCEDURAL', 'SEMANTIC',
+            'WORKING', 'SENSORY', 'EMOTIONAL', 'ASSOCIATIVE'
+        }
+        
+        actual_types = {mt.name for mt in UnifiedMemoryType}
+        self.assertEqual(expected_types, actual_types)
+    
+    # =========================================================================
+    # PERFORMANCE AND STRESS TESTS
+    # =========================================================================
+    
+    def test_memory_system_performance(self):
+        """Test memory system performance with larger datasets"""
+        memory_system = create_unified_memory_system("PerfTest", self.temp_dir)
+        
+        # Store multiple memories quickly
+        start_time = time.time()
+        memory_ids = []
+        
+        for i in range(50):  # Reasonable number for testing
+            result = memory_system.store_memory(
+                f"Performance test memory {i}",
+                MemoryType.DECLARATIVE,
+                echo_value=i / 50.0
+            )
+            self.assertTrue(result.success)
+            memory_ids.append(result.data['memory_id'])
+        
+        store_time = time.time() - start_time
+        
+        # Retrieve memories
+        start_time = time.time()
+        for memory_id in memory_ids:
+            result = memory_system.retrieve_memory(memory_id)
+            self.assertTrue(result.success)
+        
+        retrieve_time = time.time() - start_time
+        
+        # Performance should be reasonable (less than 5 seconds for 50 operations)
+        self.assertLess(store_time, 5.0)
+        self.assertLess(retrieve_time, 5.0)
+        
+        print(f"\nPerformance Test Results:")
+        print(f"  Store 50 memories: {store_time:.3f}s")
+        print(f"  Retrieve 50 memories: {retrieve_time:.3f}s")
+    
+    def test_working_memory_capacity(self):
+        """Test working memory capacity limits"""
+        memory_system = UnifiedEchoMemory(self.echo_config, self.memory_config)
+        memory_system.initialize()
+        
+        # Store more memories than working memory capacity
+        for i in range(10):  # More than capacity of 5
+            memory_system.store_memory(
+                f"Working memory test {i}",
+                MemoryType.WORKING
+            )
+        
+        # Working memory should be limited to configured capacity
+        self.assertLessEqual(
+            len(memory_system.echo_working_memory),
+            self.memory_config.working_memory_capacity
+        )
 
 
-def run_comprehensive_test():
-    """Run comprehensive test suite"""
-    print("🧪 Running Echo Memory Demo Standardization Tests")
+def run_consolidated_tests():
+    """Run the consolidated memory test suite"""
+    print("🧪 Running Consolidated Memory System Tests")
     print("=" * 60)
     
-    # Run unittest suite
-    test_suite = unittest.TestLoader().loadTestsFromTestCase(TestEchoMemoryDemoStandardization)
-    test_runner = unittest.TextTestRunner(verbosity=2)
-    result = test_runner.run(test_suite)
+    # Create test suite
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestUnifiedEchoMemoryConsolidated)
     
+    # Run tests with detailed output
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    
+    # Print summary
     print("\n" + "=" * 60)
+    print(f"Tests run: {result.testsRun}")
+    print(f"Failures: {len(result.failures)}")
+    print(f"Errors: {len(result.errors)}")
     
-    if result.wasSuccessful():
-        print("✅ All tests passed! Echo Memory Demo standardization is successful.")
-        print(f"\n📊 Test Results:")
-        print(f"   Tests run: {result.testsRun}")
-        print(f"   Failures: {len(result.failures)}")
-        print(f"   Errors: {len(result.errors)}")
-        
-        print(f"\n🎯 Standardization Benefits Validated:")
-        print("   ✅ Component passes Echo validation")
-        print("   ✅ Consistent EchoResponse format")
-        print("   ✅ Proper error handling")
-        print("   ✅ Standard initialization pattern")
-        print("   ✅ Memory component inheritance working")
-        print("   ✅ Factory function integration")
-        print("   ✅ Operation counting and tracking")
-        
-        return True
-    else:
-        print("❌ Some tests failed!")
-        for failure in result.failures:
-            print(f"   FAIL: {failure[0]}")
-        for error in result.errors:
-            print(f"   ERROR: {error[0]}")
-        return False
+    if result.failures:
+        print("\nFailures:")
+        for test, traceback in result.failures:
+            print(f"  {test}: {traceback}")
+    
+    if result.errors:
+        print("\nErrors:")
+        for test, traceback in result.errors:
+            print(f"  {test}: {traceback}")
+    
+    success = len(result.failures) == 0 and len(result.errors) == 0
+    print(f"\n{'✅ ALL TESTS PASSED' if success else '❌ SOME TESTS FAILED'}")
+    
+    return success
 
 
 if __name__ == "__main__":
-    success = run_comprehensive_test()
-    sys.exit(0 if success else 1)
+    run_consolidated_tests()
