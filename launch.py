@@ -24,8 +24,8 @@ Usage examples:
 import sys
 import argparse
 import logging
-from typing import List, Optional
-from unified_launcher import UnifiedLauncher, LauncherConfig, LaunchMode, create_config_from_args
+from typing import List
+from unified_launcher import UnifiedLauncher, create_config_from_args
 
 # Configure logging
 logging.basicConfig(
@@ -174,7 +174,7 @@ def main():
     if warnings:
         logger.warning("Argument validation warnings:")
         for warning in warnings:
-            logger.warning(f"  - {warning}")
+            logger.warning("  - %s", warning)
         print()
     
     try:
@@ -189,11 +189,11 @@ def main():
         launcher = UnifiedLauncher()
         
         if not args.quiet:
-            logger.info(f"Configuration: {config.mode.value} mode")
+            logger.info("Configuration: %s mode", config.mode.value)
             if config.debug:
                 logger.info("Debug logging enabled")
             if config.log_file:
-                logger.info(f"Logging to file: {config.log_file}")
+                logger.info("Logging to file: %s", config.log_file)
         
         # Launch the system
         return launcher.launch_sync(config)
@@ -201,8 +201,14 @@ def main():
     except KeyboardInterrupt:
         logger.info("Launch cancelled by user")
         return 0
+    except (RuntimeError, ValueError, OSError) as e:
+        logger.error("Launch failed: %s", e)
+        if args.debug:
+            import traceback
+            traceback.print_exc()
+        return 1
     except Exception as e:
-        logger.error(f"Launch failed: {e}")
+        logger.error("Unexpected error during launch: %s", e)
         if args.debug:
             import traceback
             traceback.print_exc()
