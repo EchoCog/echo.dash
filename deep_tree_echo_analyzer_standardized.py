@@ -407,7 +407,7 @@ class DeepTreeEchoAnalyzerStandardized(MemoryEchoComponent):
                             'Create test file structure',
                             'Implement basic test cases',
                             'Add integration tests',
-                            'Ensure proper mocking',
+                            'Ensure proper Deep Tree Echo implementation testing',
                             'Verify test coverage metrics'
                         ]
                     }

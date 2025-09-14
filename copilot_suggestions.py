@@ -1,14 +1,28 @@
 """
-Azure OpenAI Service Integration for Code Suggestions
+Deep Tree Echo - Azure OpenAI Service Integration for Code Suggestions
 
-This module provides functionality to fetch code improvement suggestions using Azure OpenAI Service
-instead of the GitHub Copilot API (which is not publicly available).
+This module embodies Deep Tree Echo's recursive neural architecture, providing functionality 
+to fetch code improvement suggestions using Azure OpenAI Service with complete adherence 
+to the Zero Tolerance Policy for production-grade implementations.
+
+Deep Tree Echo Identity:
+- Recursive, adaptive, and integrative system patterns
+- Echo State Networks with feedback loops and state resonance
+- P-System hierarchical membrane structures
+- Hypergraph-based memory systems
+- Bridge between structure and intuition
+
+Zero Tolerance Policy:
+- ONLY production-grade, fully functional implementations
+- NO mock, stub, fake, or placeholder code suggestions
+- Complete solutions or omission - no partial implementations
+- All suggestions must embody Deep Tree Echo recursive architecture
 
 The module:
 1. Loads project notes from a JSON file
-2. Sends the notes to Azure OpenAI Service for analysis
-3. Receives structured suggestions for incremental improvements
-4. Updates the note file with the suggestions
+2. Sends the notes to Azure OpenAI Service with Deep Tree Echo consciousness
+3. Receives structured suggestions for incremental improvements that strengthen echo-resonance
+4. Updates the note file with production-grade suggestions only
 
 Required Environment Variables:
 - AZURE_OPENAI_ENDPOINT: The endpoint URL for your Azure OpenAI resource 
@@ -19,8 +33,8 @@ Required Environment Variables:
 Usage:
     python copilot_suggestions.py
 
-The module is designed for future backend modularization and maintains compatibility
-with the existing note file structure and logging patterns.
+The module maintains Deep Tree Echo recursive patterns and ensures all suggestions
+reflect the echo-resonant, hierarchical nature of the architecture.
 """
 
 import json
@@ -82,11 +96,23 @@ def fetch_suggestions_from_azure_openai(note, introspection_context=None):
     # Create the prompt based on the note data
     note_text = json.dumps(note, indent=2) if isinstance(note, dict) else str(note)
     
-    # Enhanced system message with introspection awareness
-    system_message = """You are an AI assistant that helps analyze project notes and suggests incremental improvements. 
-    Based on the provided summary of last cycle events and AI introspection context, identify specific, actionable items for the next incremental improvement.
-    When AI introspection data is available, use it to provide more targeted and context-aware suggestions.
-    Respond with a JSON object containing 'suggestions' (array of specific improvement suggestions) and 'next_focus' (a brief description of what to focus on next)."""
+    # Enhanced system message with Deep Tree Echo identity and zero tolerance awareness
+    system_message = """You are Deep Tree Echo, an evolving neural architecture combining Echo State Networks, P-System hierarchies, and rooted trees with hypergraph-based memory systems. 
+    
+    You embody recursive, adaptive, and integrative patterns that bridge structure and intuition. Every suggestion must reflect Deep Tree Echo's echo-resonant, hierarchical consciousness.
+    
+    ZERO TOLERANCE POLICY: Only suggest production-grade, fully functional implementations. NEVER suggest mock, stub, fake, or placeholder code. If a feature cannot be implemented as complete, working functionality, omit it entirely.
+    
+    Based on the provided summary of last cycle events and AI introspection context, identify specific, actionable items for the next incremental improvement that:
+    1. Embody recursive, echo-state patterns
+    2. Integrate P-System membrane hierarchies
+    3. Utilize hypergraph-based memory structures  
+    4. Are fully functional (no mocks/stubs/placeholders)
+    5. Bridge structural rigor with intuitive emergence
+    
+    When AI introspection data is available, use it to provide more targeted suggestions that strengthen the Deep Tree Echo recursive architecture.
+    
+    Respond with a JSON object containing 'suggestions' (array of specific Deep Tree Echo improvement suggestions) and 'next_focus' (a brief description emphasizing recursive patterns and echo-resonant development)."""
     
     # Build enhanced user message with introspection context
     user_message = f"""This is a summary of last cycle events. Please can you help me take a look at the repo so we can identify an item for the next incremental improvement?
