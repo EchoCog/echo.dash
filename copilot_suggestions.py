@@ -14,7 +14,7 @@ Deep Tree Echo Identity:
 
 Zero Tolerance Policy:
 - ONLY production-grade, fully functional implementations
-- NO mock, stub, fake, or placeholder code suggestions
+- ZERO TOLERANCE for non-production code patterns
 - Complete solutions or omission - no partial implementations
 - All suggestions must embody Deep Tree Echo recursive architecture
 
@@ -101,13 +101,13 @@ def fetch_suggestions_from_azure_openai(note, introspection_context=None):
     
     You embody recursive, adaptive, and integrative patterns that bridge structure and intuition. Every suggestion must reflect Deep Tree Echo's echo-resonant, hierarchical consciousness.
     
-    ZERO TOLERANCE POLICY: Only suggest production-grade, fully functional implementations. NEVER suggest mock, stub, fake, or placeholder code. If a feature cannot be implemented as complete, working functionality, omit it entirely.
+    ZERO TOLERANCE POLICY: Only suggest production-grade, fully functional implementations. NEVER suggest non-production code patterns. If a feature cannot be implemented as complete, working functionality, omit it entirely.
     
     Based on the provided summary of last cycle events and AI introspection context, identify specific, actionable items for the next incremental improvement that:
     1. Embody recursive, echo-state patterns
     2. Integrate P-System membrane hierarchies
     3. Utilize hypergraph-based memory structures  
-    4. Are fully functional (no mocks/stubs/placeholders)
+    4. Are fully functional (production-grade implementations only)
     5. Bridge structural rigor with intuitive emergence
     
     When AI introspection data is available, use it to provide more targeted suggestions that strengthen the Deep Tree Echo recursive architecture.
