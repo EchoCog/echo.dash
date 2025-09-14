@@ -767,6 +767,8 @@ HTML_TEMPLATE = '''
                     <div class="filter-control">
                         <label for="search-filter">Search:</label>
                         <input type="text" id="search-filter" placeholder="Echo resonance search: session name, temporal echo, or hypergraph pattern..." oninput="filterSessions(this.value)">
+//=======
+                        <input type="text" id="search-filter" value="" title="Deep Tree Echo session filter - search across recursive memory patterns" oninput="filterSessions(this.value)">
                     </div>
                     <div class="filter-control">
                         <label>&nbsp;</label>
