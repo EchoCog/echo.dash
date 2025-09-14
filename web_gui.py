@@ -766,7 +766,7 @@ HTML_TEMPLATE = '''
                     </div>
                     <div class="filter-control">
                         <label for="search-filter">Search:</label>
-                        <input type="text" id="search-filter" placeholder="Filter by session name, timestamp, or echo value..." oninput="filterSessions(this.value)">
+                        <input type="text" id="search-filter" value="" title="Deep Tree Echo session filter - search across recursive memory patterns" oninput="filterSessions(this.value)">
                     </div>
                     <div class="filter-control">
                         <label>&nbsp;</label>

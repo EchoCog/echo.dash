@@ -16,7 +16,7 @@ import unittest
 import asyncio
 import logging
 import sys
-from unittest.mock import Mock, patch, AsyncMock
+import argparse
 from pathlib import Path
 
 # Add the current directory to the path for imports
