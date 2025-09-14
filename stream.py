@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-import curses
 import sys
-import os
 from pathlib import Path
 import subprocess
 
@@ -12,16 +10,16 @@ def main():
         if not echo_dir.exists():
             print("Deep Tree Echo directory not found. Is Deep Tree Echo running?")
             sys.exit(1)
-            
+
         # Launch monitor interface
         subprocess.run([
             'python3',
             'monitor_interface.py'
-        ])
-        
+        ], check=False)
+
     except KeyboardInterrupt:
         print("\nStream monitor closed.")
-    except Exception as e:
+    except (FileNotFoundError, subprocess.SubprocessError, OSError) as e:
         print(f"Error: {str(e)}")
         sys.exit(1)
 
