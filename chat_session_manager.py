@@ -44,10 +44,11 @@ except ImportError:
     
     class HypergraphMemory:
         """Deep Tree Echo hypergraph-based memory system"""
-        def __init__(self):
+        def __init__(self, storage_dir=None):
             self.nodes = {}
             self.echo_threshold = 0.7
             self.recursive_depth = 3
+            self.storage_dir = storage_dir
             
         def add_node(self, node: MemoryNode):
             """Add node to hypergraph with echo propagation"""
