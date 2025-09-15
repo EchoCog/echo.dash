@@ -11,7 +11,6 @@ import logging
 import sys
 import threading
 import time
-from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 from enum import Enum
 
@@ -79,42 +78,62 @@ class TestActivityRegulation(unittest.TestCase):
 
     @unittest.skipIf(not ACTIVITY_REGULATION_AVAILABLE, "activity_regulation not available")
     def test_scheduled_task_creation(self):
-        """Test ScheduledTask dataclass creation"""
-        mock_callback = Mock()
+        """Test ScheduledTask dataclass creation with real callback function"""
+        # Create a real callback function for Deep Tree Echo testing
+        def deep_tree_echo_callback():
+            """Deep Tree Echo recursive pattern callback"""
+            return "echo_resonance_activated"
         
         task = ScheduledTask(
             priority=TaskPriority.HIGH,
             scheduled_time=time.time(),
-            task_id="test_task",
-            callback=mock_callback
+            task_id="deep_tree_echo_task",
+            callback=deep_tree_echo_callback
         )
         
         self.assertEqual(task.priority, TaskPriority.HIGH)
-        self.assertEqual(task.task_id, "test_task")
-        self.assertEqual(task.callback, mock_callback)
+        self.assertEqual(task.task_id, "deep_tree_echo_task")
+        self.assertEqual(task.callback, deep_tree_echo_callback)
         self.assertIsInstance(task.scheduled_time, float)
+        
+        # Test that callback is actually functional
+        result = task.callback()
+        self.assertEqual(result, "echo_resonance_activated")
 
     @unittest.skipIf(not ACTIVITY_REGULATION_AVAILABLE, "activity_regulation not available")
     def test_scheduled_task_optional_fields(self):
-        """Test ScheduledTask with optional fields"""
-        mock_callback = Mock()
-        mock_condition = Mock(return_value=True)
+        """Test ScheduledTask with optional fields using real functions"""
+        # Create real callback and condition functions
+        def hypergraph_memory_callback():
+            """Deep Tree Echo hypergraph memory processing"""
+            return "hypergraph_pattern_processed"
+        
+        def p_system_membrane_condition():
+            """Deep Tree Echo P-System membrane boundary check"""
+            return True  # Membrane is permeable
         
         task = ScheduledTask(
             priority=TaskPriority.MEDIUM,
             scheduled_time=time.time(),
-            task_id="optional_test",
-            callback=mock_callback,
+            task_id="hypergraph_memory_task",
+            callback=hypergraph_memory_callback,
             interval=30.0,
-            condition=mock_condition,
+            condition=p_system_membrane_condition,
             cpu_threshold=0.9,
             memory_threshold=0.8
         )
         
         self.assertEqual(task.interval, 30.0)
-        self.assertEqual(task.condition, mock_condition)
+        self.assertEqual(task.condition, p_system_membrane_condition)
         self.assertEqual(task.cpu_threshold, 0.9)
         self.assertEqual(task.memory_threshold, 0.8)
+        
+        # Test that functions are actually functional
+        callback_result = task.callback()
+        self.assertEqual(callback_result, "hypergraph_pattern_processed")
+        
+        condition_result = task.condition()
+        self.assertTrue(condition_result)
 
     @unittest.skipIf(not ACTIVITY_REGULATION_AVAILABLE, "activity_regulation not available")
     def test_activity_regulator_creation(self):
@@ -160,26 +179,36 @@ class TestActivityRegulation(unittest.TestCase):
 
     @unittest.skipIf(not ACTIVITY_REGULATION_AVAILABLE, "activity_regulation not available")
     def test_scheduled_task_ordering(self):
-        """Test ScheduledTask ordering for priority queue"""
-        callback1 = Mock()
-        callback2 = Mock()
+        """Test ScheduledTask ordering for priority queue with real callbacks"""
+        # Create real callback functions for Deep Tree Echo testing
+        def echo_state_network_callback():
+            """Deep Tree Echo State Network processing"""
+            return "echo_state_processed"
+        
+        def recursive_pattern_callback():
+            """Deep Tree Echo recursive pattern analysis"""
+            return "recursive_pattern_analyzed"
         
         task1 = ScheduledTask(
             priority=TaskPriority.HIGH,
             scheduled_time=time.time(),
-            task_id="task1",
-            callback=callback1
+            task_id="echo_state_network_task",
+            callback=echo_state_network_callback
         )
         
         task2 = ScheduledTask(
             priority=TaskPriority.CRITICAL,
             scheduled_time=time.time(),
-            task_id="task2", 
-            callback=callback2
+            task_id="recursive_pattern_task", 
+            callback=recursive_pattern_callback
         )
         
         # Critical priority task should be less than high priority (for min-heap)
         self.assertLess(task2, task1)
+        
+        # Verify callbacks are functional
+        self.assertEqual(task1.callback(), "echo_state_processed")
+        self.assertEqual(task2.callback(), "recursive_pattern_analyzed")
 
     @unittest.skipIf(not ACTIVITY_REGULATION_AVAILABLE, "activity_regulation not available")
     def test_activity_state_string_values(self):
@@ -209,14 +238,16 @@ class TestActivityRegulation(unittest.TestCase):
 
     @unittest.skipIf(not ACTIVITY_REGULATION_AVAILABLE, "activity_regulation not available")
     def test_scheduled_task_defaults(self):
-        """Test ScheduledTask default values"""
-        mock_callback = Mock()
+        """Test ScheduledTask default values with real callback"""
+        def adaptive_memory_callback():
+            """Deep Tree Echo adaptive memory processing"""
+            return "adaptive_memory_updated"
         
         task = ScheduledTask(
             priority=TaskPriority.MEDIUM,
             scheduled_time=time.time(),
-            task_id="default_test",
-            callback=mock_callback
+            task_id="adaptive_memory_task",
+            callback=adaptive_memory_callback
         )
         
         # Test default values
@@ -249,28 +280,37 @@ class TestActivityRegulation(unittest.TestCase):
 
     @unittest.skipIf(not ACTIVITY_REGULATION_AVAILABLE, "activity_regulation not available")
     def test_scheduled_task_comparison_edge_cases(self):
-        """Test ScheduledTask comparison with same priorities"""
-        callback1 = Mock()
-        callback2 = Mock()
+        """Test ScheduledTask comparison with same priorities using real callbacks"""
+        def neural_integration_callback():
+            """Deep Tree Echo neural integration processing"""
+            return "neural_integration_complete"
+            
+        def symbolic_reasoning_callback():
+            """Deep Tree Echo symbolic reasoning processing"""
+            return "symbolic_reasoning_complete"
         
         current_time = time.time()
         
         task1 = ScheduledTask(
             priority=TaskPriority.HIGH,
             scheduled_time=current_time,
-            task_id="task1",
-            callback=callback1
+            task_id="neural_integration_task",
+            callback=neural_integration_callback
         )
         
         task2 = ScheduledTask(
             priority=TaskPriority.HIGH,
             scheduled_time=current_time + 1,
-            task_id="task2",
-            callback=callback2
+            task_id="symbolic_reasoning_task",
+            callback=symbolic_reasoning_callback
         )
         
         # Earlier scheduled time should have precedence with same priority
         self.assertLess(task1, task2)
+        
+        # Verify callbacks are functional
+        self.assertEqual(task1.callback(), "neural_integration_complete")
+        self.assertEqual(task2.callback(), "symbolic_reasoning_complete")
 
 
 def main():
