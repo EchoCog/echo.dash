@@ -10,6 +10,8 @@ Tests the launcher functionality for Deep Tree Echo system, including:
 
 This test suite validates the integration points identified in the Deep Tree Echo
 fragment analysis (issue #8) and ensures proper migration to the unified architecture.
+
+All tests use real implementations following Deep Tree Echo Zero Tolerance Policy.
 """
 
 import unittest
