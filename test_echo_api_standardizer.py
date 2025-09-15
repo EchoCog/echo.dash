@@ -11,7 +11,6 @@ import logging
 import sys
 import ast
 import tempfile
-from unittest.mock import Mock, patch, mock_open
 from pathlib import Path
 
 # Add the current directory to the path for imports
@@ -75,8 +74,17 @@ class TestEchoAPIStandardizer(unittest.TestCase):
             self.assertIsInstance(standardizer.analysis_results, dict)
 
     @unittest.skipIf(not ECHO_API_STANDARDIZER_AVAILABLE, "echo_api_standardizer not available") 
-    @patch("builtins.open", new_callable=mock_open, read_data="""
+    def test_analyze_component(self):
+        """Test component analysis functionality with real files"""
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            test_file = Path(temp_dir) / "test_component.py"
+            
+            # Write a real Python file for testing
+            with open(test_file, 'w') as f:
+                f.write("""
 class TestEchoComponent:
+    '''Deep Tree Echo test component'''
     def __init__(self):
         pass
         
@@ -86,15 +94,6 @@ class TestEchoComponent:
     def echo_method(self):
         pass
 """)
-    @patch('ast.parse')
-    def test_analyze_component(self, mock_ast_parse, mock_file):
-        """Test component analysis functionality"""
-        # Mock the AST parse to return a simple class structure
-        mock_ast = Mock()
-        mock_ast_parse.return_value = mock_ast
-        
-        with tempfile.TemporaryDirectory() as temp_dir:
-            test_file = Path(temp_dir) / "test_component.py"
             
             standardizer = EchoAPIStandardizer(temp_dir)
             
@@ -129,11 +128,15 @@ class TestEchoComponent:
         self.assertEqual(standardizer.repo_path, Path("."))
 
     @unittest.skipIf(not ECHO_API_STANDARDIZER_AVAILABLE, "echo_api_standardizer not available")
-    @patch("builtins.open", new_callable=mock_open, read_data="# Empty Python file")
-    def test_analyze_component_with_empty_file(self, mock_file):
-        """Test analysis of empty Python file"""
+    def test_analyze_component_with_empty_file(self):
+        """Test analysis of empty Python file with real file"""
         with tempfile.TemporaryDirectory() as temp_dir:
             test_file = Path(temp_dir) / "empty.py"
+            
+            # Create a real empty Python file
+            with open(test_file, 'w') as f:
+                f.write("# Empty Python file\n")
+                
             standardizer = EchoAPIStandardizer(temp_dir)
             
             try:

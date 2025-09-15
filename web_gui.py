@@ -765,10 +765,12 @@ HTML_TEMPLATE = '''
                         </select>
                     </div>
                     <div class="filter-control">
-                        <label for="search-filter">Search:</label>
-                        <input type="text" id="search-filter" placeholder="Echo resonance search: session name, temporal echo, or hypergraph pattern..." oninput="filterSessions(this.value)">
-//=======
-                        <input type="text" id="search-filter" value="" title="Deep Tree Echo session filter - search across recursive memory patterns" oninput="filterSessions(this.value)">
+                        <label for="search-filter">Deep Tree Echo Filter:</label>
+                        <input type="text" id="search-filter" value="" 
+                               title="Deep Tree Echo session filter - recursive memory pattern search" 
+                               oninput="filterSessions(this.value)" 
+                               data-echo-pattern="recursive-search"
+                               data-hypergraph-filter="session-memory">
                     </div>
                     <div class="filter-control">
                         <label>&nbsp;</label>
