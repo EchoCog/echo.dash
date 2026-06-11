@@ -19,7 +19,12 @@ Standardized API Integration:
 - Provides unified configuration and response handling
 """
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    # Use mock numpy for testing when numpy is not available
+    import mock_numpy as np
+
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Any, Set
 from enum import Enum
@@ -783,6 +788,7 @@ class Echo9mlSystem:
         
         return False
 
+# Convenience functions for easy instantiation
 
 class Echo9mlStandardized(ProcessingEchoComponent):
     """
@@ -1010,6 +1016,16 @@ def create_echo9ml_system(save_path: Optional[str] = None) -> Echo9mlSystem:
     """Create and initialize a new Echo9ml system (original interface)"""
     return Echo9mlSystem(save_path)
 
+def create_deep_tree_echo() -> PersonaKernel:
+    """Create a Deep Tree Echo persona kernel
+    
+    Module-level convenience function for creating the default Deep Tree Echo
+    persona kernel. Provides unified API for integration with other components.
+    
+    Returns:
+        PersonaKernel: Initialized Deep Tree Echo persona kernel
+    """
+    return PersonaKernel.create_deep_tree_echo()
 
 def create_echo9ml_standardized(save_path: Optional[str] = None, 
                               component_name: str = "Echo9ml",
@@ -1038,6 +1054,7 @@ def create_echo9ml_standardized(save_path: Optional[str] = None,
 __all__ = [
     'PersonaKernel', 'TensorPersonaEncoding', 'HypergraphPersonaEncoder',
     'AttentionAllocationLayer', 'EvolutionEngine', 'MetaCognitiveEnhancer',
+    'Echo9mlSystem', 'PersonaTraitType', 'create_echo9ml_system', 'create_deep_tree_echo'
     'Echo9mlSystem', 'Echo9mlStandardized', 'PersonaTraitType', 
     'create_echo9ml_system', 'create_echo9ml_standardized'
 ]
