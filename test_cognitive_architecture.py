@@ -9,7 +9,6 @@ goal processing, and personality traits.
 import unittest
 import logging
 import sys
-from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 import tempfile
 import json
@@ -103,15 +102,16 @@ class TestCognitiveArchitecture(unittest.TestCase):
         self.assertEqual(trait.current_value, 0.75)
 
     @unittest.skipIf(not COGNITIVE_ARCH_AVAILABLE, "cognitive_architecture not available")
-    @patch('cognitive_architecture.EchoselfIntrospection')
-    def test_cognitive_architecture_creation(self, mock_introspection):
-        """Test CognitiveArchitecture class instantiation"""
-        # Mock the EchoselfIntrospection to avoid import issues
-        mock_introspection.return_value = Mock()
-        
+    def test_cognitive_architecture_creation(self):
+        """Test CognitiveArchitecture class instantiation with real components"""
         try:
             cognitive_arch = CognitiveArchitecture()
             self.assertIsNotNone(cognitive_arch)
+            
+            # Test that basic attributes are available
+            self.assertTrue(hasattr(cognitive_arch, 'memory_adapter'))
+            self.assertTrue(hasattr(cognitive_arch, 'memories'))
+            
         except Exception as e:
             # If it fails due to missing dependencies, that's OK for this test
             # We just want to verify the class can be imported and instantiated

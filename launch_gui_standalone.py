@@ -4,9 +4,21 @@ import sys
 import logging
 from unified_launcher import UnifiedLauncher, create_config_from_args, create_argument_parser
 
-print("⚠️  NOTICE: This script is deprecated. Use 'python launch.py gui-standalone' for the same functionality.")
-print("   The unified launcher provides better error handling and comprehensive help.")
-print("   Run 'python launch.py --help' to see all available options.\n")
+print("⚠️  DEPRECATION NOTICE: This script is deprecated.")
+print("🚀 USE INSTEAD: python launch.py gui-standalone")
+print()
+print("📖 Migration Guide:")
+print("   OLD: python launch_gui_standalone.py --no-activity")
+print("   NEW: python launch.py gui-standalone --no-activity")
+print()
+print("💡 Benefits of the unified launcher:")
+print("   • Single entry point for all launch modes")
+print("   • Better error handling and validation")
+print("   • Comprehensive help: python launch.py --help")
+print("   • Lightweight mode still available as gui-standalone")
+print()
+print("⏳ Continuing with legacy launcher (will be removed in future version)...")
+print()
 
 # Set up logging to file instead of console
 logging.basicConfig(
