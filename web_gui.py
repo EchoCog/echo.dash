@@ -767,6 +767,12 @@ HTML_TEMPLATE = '''
                     <div class="filter-control">
                         <label for="search-filter">Search:</label>
                         <input type="text" id="search-filter" value="" title="Deep Tree Echo session filter - search across recursive memory patterns" oninput="filterSessions(this.value)">
+                        <label for="search-filter">Deep Tree Echo Filter:</label>
+                        <input type="text" id="search-filter" value="" 
+                               title="Deep Tree Echo session filter - recursive memory pattern search" 
+                               oninput="filterSessions(this.value)" 
+                               data-echo-pattern="recursive-search"
+                               data-hypergraph-filter="session-memory">
                     </div>
                     <div class="filter-control">
                         <label>&nbsp;</label>

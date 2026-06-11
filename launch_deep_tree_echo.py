@@ -9,9 +9,21 @@ Original functionality: Command-line launcher for Deep Tree Echo system
 New functionality: Standardized Echo component for programmatic integration
 """
 
-print("⚠️  NOTICE: This script is deprecated. Use 'python launch.py deep-tree-echo' for the same functionality.")
-print("   The unified launcher provides better error handling and comprehensive help.")
-print("   Run 'python launch.py --help' to see all available options.\n")
+print("⚠️  DEPRECATION NOTICE: This script is deprecated.")
+print("🚀 USE INSTEAD: python launch.py deep-tree-echo")
+print()
+print("📖 Migration Guide:")
+print("   OLD: python launch_deep_tree_echo.py --gui --browser --debug")
+print("   NEW: python launch.py deep-tree-echo --gui --browser --debug")
+print()
+print("💡 Benefits of the unified launcher:")
+print("   • Single entry point for all launch modes")
+print("   • Better error handling and validation")
+print("   • Comprehensive help: python launch.py --help")
+print("   • Full async system with standardized Echo interfaces")
+print()
+print("⏳ Continuing with legacy launcher (will be removed in future version)...")
+print()
 
 import sys
 import asyncio
