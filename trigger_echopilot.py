@@ -1,259 +1,79 @@
 #!/usr/bin/env python3
 """
-Script to manually trigger the EchoPilot workflow for testing.
-This simulates what the GitHub Actions workflow would do.
+EchoPilot Trigger - Unified Interface
+
+This module provides the primary interface for triggering EchoPilot workflows.
+It uses the standardized Echo component implementation internally while maintaining
+backward compatibility with legacy usage patterns.
+
+This is now the unified implementation that replaces the legacy script.
+The old implementation is preserved in trigger_echopilot_legacy.py for reference.
 """
 
-import os
+# Primary interface - use standardized implementation
+from trigger_echopilot_standardized import (
+    EchoPilotTriggerStandardized,
+    create_echopilot_trigger,
+    main as standardized_main
+)
+
+# For backward compatibility, expose the old interface
 import json
-import subprocess
-import tempfile
 from pathlib import Path
 from datetime import datetime
 
+# Global instance for backward compatibility
+_global_trigger = None
+
+def _get_global_trigger():
+    """Get or create the global trigger instance for backward compatibility"""
+    global _global_trigger
+    if _global_trigger is None:
+        _global_trigger = create_echopilot_trigger({
+            'analysis_timeout': 300,
+            'max_files_to_analyze': 10
+        })
+        _global_trigger.initialize()
+    return _global_trigger
+
 def run_analysis():
-    """Run the analysis step"""
-    print("🔍 Running EchoPilot Analysis...")
-    print("=" * 50)
+    """
+    Legacy interface: Run the analysis step
     
-    # Create a temporary file for outputs
-    with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
-        output_file = f.name
+    Returns:
+        dict: Analysis outputs in legacy format
+    """
+    trigger = _get_global_trigger()
+    result = trigger.process(None, analysis_type='full')
     
-    # Set environment variable
-    env = os.environ.copy()
-    env['GITHUB_OUTPUT'] = output_file
-    
-    # Run the analysis script from the workflow
-    analysis_script = """
-import os
-import json
-import re
-import subprocess
-import sys
-from pathlib import Path
-from collections import defaultdict
-
-def run_command(cmd, capture_output=True):
-    try:
-        result = subprocess.run(cmd, shell=True, capture_output=capture_output, text=True, timeout=300)
-        return result.returncode, result.stdout, result.stderr
-    except subprocess.TimeoutExpired:
-        return -1, "", "Command timed out"
-    except Exception as e:
-        return -1, "", str(e)
-
-# Initialize analysis results
-analysis_results = {
-    'code_quality_issues': [],
-    'architecture_gaps': [],
-    'test_coverage_gaps': [],
-    'dependency_issues': [],
-    'documentation_gaps': []
-}
-
-repo_path = Path('.')
-
-# 1. Code Quality Analysis
-print("🔍 Analyzing code quality...")
-
-# Run pylint on Python files
-python_files = list(repo_path.glob('**/*.py'))
-if python_files:
-    # Test with a few files first
-    test_files = python_files[:5]
-    pylint_cmd = f"pylint {' '.join(str(f) for f in test_files)} --output-format=json --exit-zero"
-    returncode, stdout, stderr = run_command(pylint_cmd)
-    
-    if returncode == 0 and stdout:
-        try:
-            pylint_results = json.loads(stdout)
-            for issue in pylint_results:
-                if issue.get('type') in ['error', 'warning']:
-                    analysis_results['code_quality_issues'].append({
-                        'file': issue.get('path', 'unknown'),
-                        'line': issue.get('line', 0),
-                        'message': issue.get('message', ''),
-                        'type': issue.get('type', ''),
-                        'symbol': issue.get('symbol', ''),
-                        'severity': 'high' if issue.get('type') == 'error' else 'medium'
-                    })
-        except json.JSONDecodeError:
-            pass
-
-# 2. Architecture Gap Analysis
-print("🏗️ Analyzing architecture gaps...")
-
-# Check for fragmented memory system
-memory_files = list(repo_path.glob('**/*memory*.py')) + list(repo_path.glob('**/*Memory*.py'))
-if len(memory_files) > 3:
-    analysis_results['architecture_gaps'].append({
-        'gap': 'Fragmented Memory System',
-        'description': f'Found {len(memory_files)} memory-related files that should be unified',
-        'files': [str(f) for f in memory_files],
-        'priority': 'high',
-        'recommendation': 'Consolidate memory operations into unified_echo_memory.py'
-    })
-
-# Check for multiple launch scripts
-launch_files = list(repo_path.glob('**/launch_*.py'))
-if len(launch_files) > 3:
-    analysis_results['architecture_gaps'].append({
-        'gap': 'Multiple Launch Scripts',
-        'description': f'Found {len(launch_files)} launch scripts that could be consolidated',
-        'files': [str(f) for f in launch_files],
-        'priority': 'medium',
-        'recommendation': 'Consider creating a unified launcher with configuration options'
-    })
-
-# Check for test file organization
-test_files = list(repo_path.glob('**/test_*.py'))
-if test_files and not (repo_path / 'tests').exists():
-    analysis_results['architecture_gaps'].append({
-        'gap': 'Test Files Not Organized',
-        'description': f'Found {len(test_files)} test files scattered throughout the codebase',
-        'files': [str(f) for f in test_files[:10]],
-        'priority': 'medium',
-        'recommendation': 'Organize test files into a dedicated tests/ directory'
-    })
-
-# 3. Error Handling Analysis
-print("🚨 Analyzing error handling...")
-
-error_patterns = [
-    r'except\\s+Exception\\s*:',  # Generic exception handling
-    r'except\\s*:',  # Bare except clauses
-]
-
-error_issues = []
-for pattern in error_patterns:
-    for file in python_files[:10]:  # Test with first 10 files
-        try:
-            with open(file, 'r') as f:
-                content = f.read()
-                matches = re.finditer(pattern, content, re.MULTILINE)
-                for match in matches:
-                    line_num = content[:match.start()].count('\\n') + 1
-                    error_issues.append({
-                        'file': str(file),
-                        'line': line_num,
-                        'pattern': pattern,
-                        'context': content.split('\\n')[line_num-1].strip()[:100]
-                    })
-        except Exception:
-            continue
-
-if error_issues:
-    analysis_results['code_quality_issues'].extend(error_issues[:20])
-
-# 4. Large Files Analysis
-print("📏 Analyzing file sizes...")
-large_files = []
-for file in python_files:
-    try:
-        size = file.stat().st_size
-        if size > 50000:  # Files larger than 50KB
-            with open(file, 'r') as f:
-                lines = len(f.readlines())
-            large_files.append({
-                'file': str(file),
-                'size_kb': size // 1024,
-                'lines': lines,
-                'issue': 'Large file that may need refactoring',
-                'priority': 'medium'
-            })
-    except Exception:
-        continue
-
-if large_files:
-    analysis_results['code_quality_issues'].extend(large_files[:5])
-
-# 5. Security Analysis
-print("🔒 Analyzing security patterns...")
-
-security_patterns = [
-    r'password\\s*=',  # Hardcoded passwords
-    r'api_key\\s*=',  # Hardcoded API keys
-    r'secret\\s*=',  # Hardcoded secrets
-    r'eval\\s*\\(',  # eval() usage
-    r'exec\\s*\\(',  # exec() usage
-    r'os\\.system\\s*\\(',  # os.system() usage
-    r'subprocess\\.call\\s*\\(',  # subprocess.call() usage
-]
-
-security_issues = []
-for pattern in security_patterns:
-    for file in python_files:
-        try:
-            with open(file, 'r') as f:
-                content = f.read()
-                matches = re.finditer(pattern, content, re.MULTILINE)
-                for match in matches:
-                    line_num = content[:match.start()].count('\\n') + 1
-                    context = content.split('\\n')[line_num-1].strip()[:100]
-                    security_issues.append({
-                        'file': str(file),
-                        'line': line_num,
-                        'pattern': pattern,
-                        'context': context,
-                        'issue': 'Potential security vulnerability',
-                        'priority': 'high'
-                    })
-        except Exception:
-            continue
-
-if security_issues:
-    analysis_results['code_quality_issues'].extend(security_issues[:10])
-
-# Set GitHub Actions outputs
-for key, value in analysis_results.items():
-    output_file = os.environ.get('GITHUB_OUTPUT')
-    if output_file:
-        with open(output_file, 'a') as f:
-            f.write(f"{key}={json.dumps(value)}\\n")
+    if result.success:
+        # Convert to legacy format
+        analysis_results = result.data.get('analysis_results', {})
+        outputs = {}
+        
+        for category in ['code_quality_issues', 'architecture_gaps', 'test_coverage_gaps', 
+                        'dependency_issues', 'documentation_gaps']:
+            outputs[category] = json.dumps(analysis_results.get(category, []))
+        
+        return outputs
     else:
-        print(f"Warning: GITHUB_OUTPUT not set, using fallback output")
-        print(f"::set-output name={key}::{json.dumps(value)}")
-
-print(f"✅ Analysis complete. Found:")
-print(f"  - {len(analysis_results['code_quality_issues'])} code quality issues")
-print(f"  - {len(analysis_results['architecture_gaps'])} architecture gaps")
-print(f"  - {len(analysis_results['test_coverage_gaps'])} test coverage gaps")
-print(f"  - {len(analysis_results['dependency_issues'])} dependency issues")
-print(f"  - {len(analysis_results['documentation_gaps'])} documentation gaps")
-"""
-    
-    # Run the analysis
-    result = subprocess.run(['python3', '-c', analysis_script], 
-                          env=env, capture_output=True, text=True)
-    
-    print(result.stdout)
-    if result.stderr:
-        print("Errors:")
-        print(result.stderr)
-    
-    # Read the outputs
-    outputs = {}
-    try:
-        with open(output_file, 'r') as f:
-            for line in f:
-                if '=' in line:
-                    key, value = line.strip().split('=', 1)
-                    outputs[key] = value
-    except Exception as e:
-        print(f"Error reading outputs: {e}")
-    
-    # Clean up
-    os.unlink(output_file)
-    
-    return outputs
+        print(f"❌ Analysis failed: {result.message}")
+        return {}
 
 def create_issues(outputs):
-    """Create GitHub issues based on analysis results"""
+    """
+    Legacy interface: Create GitHub issues based on analysis results
+    
+    Args:
+        outputs (dict): Analysis outputs from run_analysis()
+        
+    Returns:
+        int: Number of issues that would be created
+    """
     print("\n🔧 Creating GitHub Issues...")
     print("=" * 50)
     
-    # Parse outputs
+    # Parse outputs (they're JSON strings in legacy format)
     def parse_output(output_str):
         try:
             return json.loads(output_str) if output_str else []
@@ -274,7 +94,7 @@ def create_issues(outputs):
     print(f"  - Dependency Issues: {len(dependency_issues)}")
     print(f"  - Documentation Gaps: {len(documentation_gaps)}")
     
-    # Simulate issue creation
+    # Simulate issue creation (same logic as legacy)
     issues_created = 0
     
     # Architecture gaps (high priority)
@@ -349,19 +169,16 @@ def create_issues(outputs):
     return issues_created
 
 def main():
-    print("🚀 EchoPilot Manual Trigger")
-    print("=" * 50)
-    print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print()
-    
-    # Run analysis
-    outputs = run_analysis()
-    
-    # Create issues
-    issues_created = create_issues(outputs)
-    
-    print(f"\n✅ EchoPilot run complete!")
-    print(f"Total issues that would be created: {issues_created}")
+    """
+    Main function - provides legacy compatibility while using standardized implementation
+    """
+    # Use the standardized main function which provides the same interface
+    # but with enhanced features
+    return standardized_main()
+
+# Export the standardized classes for advanced usage
+EchoComponent = EchoPilotTriggerStandardized
+create_trigger = create_echopilot_trigger
 
 if __name__ == "__main__":
     main()

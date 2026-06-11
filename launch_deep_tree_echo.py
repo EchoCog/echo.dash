@@ -204,6 +204,9 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
                 
                 # Parse the constructed arguments
                 args = parser.parse_args(cmd_args)
+                # Create real arguments object from dictionary using argparse Namespace
+                import argparse
+                args = argparse.Namespace(**args_dict)
                 config = create_config_from_args(config_name, args)
             else:
                 # Use default configuration
@@ -267,6 +270,9 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
                 
                 # Parse the constructed arguments
                 args = parser.parse_args(cmd_args)
+                # Create real arguments object from dictionary using argparse Namespace
+                import argparse
+                args = argparse.Namespace(**args_dict)
             else:
                 parser = create_argument_parser(config_name)
                 args = parser.parse_args([])

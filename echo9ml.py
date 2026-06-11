@@ -12,6 +12,11 @@ evolution within a ggml-inspired framework. This module provides:
 6. Meta-cognitive enhancement for self-monitoring
 
 Based on the architectural specification in echo9ml.md
+
+Standardized API Integration:
+- Implements standardized Echo component interface
+- Maintains backward compatibility with original interface
+- Provides unified configuration and response handling
 """
 
 import numpy as np
@@ -23,6 +28,16 @@ import json
 import logging
 from collections import deque, defaultdict
 from pathlib import Path
+
+# Import standardized Echo components
+try:
+    from echo_component_base import ProcessingEchoComponent, EchoConfig, EchoResponse
+    ECHO_STANDARDIZED_AVAILABLE = True
+except ImportError:
+    ProcessingEchoComponent = object
+    EchoConfig = None
+    EchoResponse = None
+    ECHO_STANDARDIZED_AVAILABLE = False
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -762,20 +777,267 @@ class Echo9mlSystem:
                 
                 logger.info("Echo9ml state loaded successfully")
                 return True
-                
+        
         except Exception as e:
             logger.error(f"Failed to load Echo9ml state: {e}")
         
         return False
 
+
+class Echo9mlStandardized(ProcessingEchoComponent):
+    """
+    Standardized wrapper for Echo9ml system
+    
+    Provides Echo component interface while maintaining full backward compatibility
+    with the original Echo9mlSystem interface.
+    """
+    
+    def __init__(self, config: EchoConfig):
+        if not ECHO_STANDARDIZED_AVAILABLE:
+            raise ImportError("Echo standardized components not available")
+            
+        super().__init__(config)
+        
+        # Extract Echo9ml-specific configuration
+        save_path = config.custom_params.get('save_path', None)
+        
+        # Initialize the core Echo9ml system
+        self.echo9ml_system = Echo9mlSystem(save_path)
+        
+        # Track processing statistics
+        self.experiences_processed = 0
+        self.evolution_cycles = 0
+        
+    def initialize(self) -> EchoResponse:
+        """Initialize the Echo9ml system"""
+        try:
+            # Echo9ml system is already initialized in __init__
+            self._initialized = True
+            
+            self.logger.info(f"Echo9ml system initialized with persona: {self.echo9ml_system.persona_kernel.name}")
+            
+            return EchoResponse(
+                success=True,
+                message="Echo9ml system initialized successfully",
+                data={
+                    'persona_name': self.echo9ml_system.persona_kernel.name,
+                    'trait_count': len(self.echo9ml_system.persona_kernel.traits),
+                    'tensor_shape': self.echo9ml_system.tensor_encoding.tensor_shape,
+                    'save_path': str(self.echo9ml_system.save_path)
+                },
+                metadata={
+                    'system_type': 'Echo9ml',
+                    'persona_type': 'DeepTreeEcho'
+                }
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "initialize")
+    
+    def process(self, input_data: Any, **kwargs) -> EchoResponse:
+        """
+        Process experiences through Echo9ml system
+        
+        Args:
+            input_data: Experience data (dict) or command string
+            **kwargs: Additional processing parameters
+        
+        Returns:
+            EchoResponse with processing results
+        """
+        try:
+            if not self._initialized:
+                return EchoResponse(
+                    success=False,
+                    message="Component not initialized - call initialize() first"
+                )
+            
+            # Validate input
+            validation = self.validate_input(input_data)
+            if not validation.success:
+                return validation
+            
+            # Handle different input types
+            if isinstance(input_data, str):
+                # Handle command strings
+                if input_data == "cognitive_snapshot":
+                    result = self.echo9ml_system.get_cognitive_snapshot()
+                    return EchoResponse(
+                        success=True,
+                        data=result,
+                        message="Cognitive snapshot retrieved"
+                    )
+                elif input_data == "save_state":
+                    success = self.echo9ml_system.save_state()
+                    return EchoResponse(
+                        success=success,
+                        message="State saved" if success else "Failed to save state"
+                    )
+                elif input_data == "load_state":
+                    success = self.echo9ml_system.load_state()
+                    return EchoResponse(
+                        success=success,
+                        message="State loaded" if success else "Failed to load state"
+                    )
+                else:
+                    # Treat as simple experience content
+                    experience = {
+                        "type": "interaction",
+                        "content": input_data,
+                        "timestamp": time.time()
+                    }
+            elif isinstance(input_data, dict):
+                # Use as experience directly
+                experience = input_data
+            else:
+                return EchoResponse(
+                    success=False,
+                    message=f"Unsupported input type: {type(input_data)}"
+                )
+            
+            # Process experience through Echo9ml system
+            result = self.echo9ml_system.process_experience(experience)
+            self.experiences_processed += 1
+            
+            return EchoResponse(
+                success=True,
+                data=result,
+                message=f"Experience processed successfully (#{self.experiences_processed})",
+                metadata={
+                    'experience_type': experience.get('type', 'unknown'),
+                    'processing_time': result.get('processing_time', 0),
+                    'evolution_strategy': result.get('evolution_strategy', 'none')
+                }
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "process")
+    
+    def echo(self, data: Any, echo_value: float = 0.0) -> EchoResponse:
+        """
+        Perform echo operation with persona evolution
+        
+        Args:
+            data: Data to echo (can be experience or persona state)
+            echo_value: Echo strength (affects evolution intensity)
+        
+        Returns:
+            EchoResponse with echo-enhanced persona state
+        """
+        try:
+            # Get current persona state
+            current_snapshot = self.echo9ml_system.get_cognitive_snapshot()
+            
+            # Create echo experience based on input data
+            echo_experience = {
+                "type": "echo_reflection",
+                "content": data,
+                "echo_value": echo_value,
+                "timestamp": time.time(),
+                "valence": echo_value,  # Use echo_value as emotional valence
+                "importance": min(1.0, 0.5 + echo_value),  # Higher echo = more important
+                "context": "echo_operation"
+            }
+            
+            # Process the echo experience to evolve persona
+            if echo_value > 0.1:  # Only process if echo is significant
+                evolution_result = self.echo9ml_system.process_experience(echo_experience)
+                self.evolution_cycles += 1
+            else:
+                evolution_result = None
+            
+            # Get updated persona state
+            updated_snapshot = self.echo9ml_system.get_cognitive_snapshot()
+            
+            echo_data = {
+                'original_data': data,
+                'echo_value': echo_value,
+                'persona_before': current_snapshot,
+                'persona_after': updated_snapshot,
+                'evolution_occurred': evolution_result is not None,
+                'evolution_result': evolution_result,
+                'timestamp': time.time()
+            }
+            
+            return EchoResponse(
+                success=True,
+                data=echo_data,
+                message=f"Echo operation completed (value: {echo_value}, evolution: {'yes' if evolution_result else 'no'})",
+                metadata={
+                    'echo_value': echo_value,
+                    'evolution_cycles': self.evolution_cycles,
+                    'persona_traits': len(updated_snapshot.get('persona_state', {}).get('traits', {}))
+                }
+            )
+            
+        except Exception as e:
+            return self.handle_error(e, "echo")
+    
+    def get_persona_state(self) -> EchoResponse:
+        """Get current persona state"""
+        try:
+            snapshot = self.echo9ml_system.get_cognitive_snapshot()
+            return EchoResponse(
+                success=True,
+                data=snapshot,
+                message="Persona state retrieved"
+            )
+        except Exception as e:
+            return self.handle_error(e, "get_persona_state")
+    
+    def get_processing_stats(self) -> EchoResponse:
+        """Get processing statistics"""
+        try:
+            stats = {
+                'experiences_processed': self.experiences_processed,
+                'evolution_cycles': self.evolution_cycles,
+                'interaction_count': self.echo9ml_system.interaction_count,
+                'system_log_entries': len(self.echo9ml_system.system_log),
+                'save_path': str(self.echo9ml_system.save_path)
+            }
+            
+            return EchoResponse(
+                success=True,
+                data=stats,
+                message="Processing statistics retrieved"
+            )
+        except Exception as e:
+            return self.handle_error(e, "get_processing_stats")
+
+
 # Convenience function for easy instantiation
 def create_echo9ml_system(save_path: Optional[str] = None) -> Echo9mlSystem:
-    """Create and initialize a new Echo9ml system"""
+    """Create and initialize a new Echo9ml system (original interface)"""
     return Echo9mlSystem(save_path)
+
+
+def create_echo9ml_standardized(save_path: Optional[str] = None, 
+                              component_name: str = "Echo9ml",
+                              version: str = "1.0.0") -> Echo9mlStandardized:
+    """Create and initialize a new standardized Echo9ml component"""
+    if not ECHO_STANDARDIZED_AVAILABLE:
+        raise ImportError("Echo standardized components not available")
+    
+    config = EchoConfig(
+        component_name=component_name,
+        version=version,
+        echo_threshold=0.75,
+        debug_mode=False,
+        custom_params={'save_path': save_path}
+    )
+    
+    component = Echo9mlStandardized(config)
+    result = component.initialize()
+    
+    if not result.success:
+        raise RuntimeError(f"Failed to initialize Echo9ml component: {result.message}")
+    
+    return component
 
 # Export main classes for integration
 __all__ = [
     'PersonaKernel', 'TensorPersonaEncoding', 'HypergraphPersonaEncoder',
     'AttentionAllocationLayer', 'EvolutionEngine', 'MetaCognitiveEnhancer',
-    'Echo9mlSystem', 'PersonaTraitType', 'create_echo9ml_system'
+    'Echo9mlSystem', 'Echo9mlStandardized', 'PersonaTraitType', 
+    'create_echo9ml_system', 'create_echo9ml_standardized'
 ]
