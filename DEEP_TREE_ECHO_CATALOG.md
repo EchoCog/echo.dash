@@ -69,6 +69,13 @@ Comprehensive catalog of all Deep Tree Echo fragments, their relationships, and 
 - **Purpose**: System monitoring and health checks
 - **Integration**: Monitors Deep Tree Echo system performance
 
+#### 8. **Test Infrastructure** - `test_*_standardized.py`
+- **Purpose**: Standardized testing for Echo component integration
+- **Key Example**: `test_launch_deep_tree_echo_standardized.py` (20 tests, comprehensive coverage)
+- **Integration**: Tests fragment discovery, migration support, performance benchmarks
+- **Status**: Active, enhanced with integration patterns
+- **Documentation**: [TEST_PATTERNS_STANDARDIZED.md](TEST_PATTERNS_STANDARDIZED.md)
+
 ---
 
 ## 🏗️ Architectural Lineage Map
@@ -119,6 +126,7 @@ graph TD
 | `echoself_introspection.py` | Extension | High | Integrated | Medium |
 | `echoself_demo.py` | Extension | Medium | Enhanced | Completed |
 | `monitor.py` | Utility | Low | Monitoring | Low |
+| `test_*_standardized.py` | Test Infrastructure | Medium | Comprehensive | High (Quality Assurance) |
 
 ---
 
