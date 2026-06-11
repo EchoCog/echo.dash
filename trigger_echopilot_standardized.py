@@ -71,9 +71,12 @@ class EchoPilotTriggerStandardized(MemoryEchoComponent):
             **kwargs: Additional options like 'analysis_type', 'target_files'
         """
         try:
-            validation = self.validate_input(input_data)
-            if not validation.success:
-                return validation
+            # For EchoPilot trigger, None input means "run default analysis"
+            # Override the base class validation for this specific case
+            if input_data is not None:
+                validation = self.validate_input(input_data)
+                if not validation.success:
+                    return validation
             
             analysis_type = kwargs.get('analysis_type', 'full')
             target_files = kwargs.get('target_files', None)
@@ -121,6 +124,7 @@ class EchoPilotTriggerStandardized(MemoryEchoComponent):
         Echoes analysis results with the provided echo value for amplification.
         """
         try:
+            # For EchoPilot trigger, None data means "run default analysis and echo"
             # Process the data to get fresh analysis if needed
             process_result = self.process(data)
             
