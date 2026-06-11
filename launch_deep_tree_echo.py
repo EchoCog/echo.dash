@@ -9,9 +9,21 @@ Original functionality: Command-line launcher for Deep Tree Echo system
 New functionality: Standardized Echo component for programmatic integration
 """
 
-print("⚠️  NOTICE: This script is deprecated. Use 'python launch.py deep-tree-echo' for the same functionality.")
-print("   The unified launcher provides better error handling and comprehensive help.")
-print("   Run 'python launch.py --help' to see all available options.\n")
+print("⚠️  DEPRECATION NOTICE: This script is deprecated.")
+print("🚀 USE INSTEAD: python launch.py deep-tree-echo")
+print()
+print("📖 Migration Guide:")
+print("   OLD: python launch_deep_tree_echo.py --gui --browser --debug")
+print("   NEW: python launch.py deep-tree-echo --gui --browser --debug")
+print()
+print("💡 Benefits of the unified launcher:")
+print("   • Single entry point for all launch modes")
+print("   • Better error handling and validation")
+print("   • Comprehensive help: python launch.py --help")
+print("   • Full async system with standardized Echo interfaces")
+print()
+print("⏳ Continuing with legacy launcher (will be removed in future version)...")
+print()
 
 import sys
 import asyncio
@@ -191,6 +203,19 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
             
             # Create config from arguments or use provided config
             if args_dict:
+                # Create real args object using argparse with proper defaults
+                parser = create_argument_parser(config_name)
+                
+                # Convert dict to command line arguments
+                cmd_args = []
+                for key, value in args_dict.items():
+                    if isinstance(value, bool) and value:
+                        cmd_args.append(f"--{key.replace('_', '-')}")
+                    elif not isinstance(value, bool):
+                        cmd_args.extend([f"--{key.replace('_', '-')}", str(value)])
+                
+                # Parse the constructed arguments
+                args = parser.parse_args(cmd_args)
                 # Create real arguments object from dictionary using argparse Namespace
                 import argparse
                 args = argparse.Namespace(**args_dict)
@@ -244,6 +269,19 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
         """Create configuration from arguments"""
         try:
             if args_dict:
+                # Create real args object using argparse with proper defaults
+                parser = create_argument_parser(config_name)
+                
+                # Convert dict to command line arguments
+                cmd_args = []
+                for key, value in args_dict.items():
+                    if isinstance(value, bool) and value:
+                        cmd_args.append(f"--{key.replace('_', '-')}")
+                    elif not isinstance(value, bool):
+                        cmd_args.extend([f"--{key.replace('_', '-')}", str(value)])
+                
+                # Parse the constructed arguments
+                args = parser.parse_args(cmd_args)
                 # Create real arguments object from dictionary using argparse Namespace
                 import argparse
                 args = argparse.Namespace(**args_dict)

@@ -279,8 +279,14 @@ from echoself_introspection import (
     SemanticSalienceAssessor,
     AdaptiveAttentionAllocator,
     RepositoryIntrospector,
-    HypergraphNode
+    HypergraphNode,
+    _ECHO_INTEGRATION_AVAILABLE
 )
+
+# Import unified interface if available
+if _ECHO_INTEGRATION_AVAILABLE:
+    from echoself_introspection import EchoselfIntrospectionComponent
+    from echo_component_base import EchoConfig
 
 class TestSemanticSalienceAssessor(unittest.TestCase):
     """Test semantic salience assessment functionality"""
@@ -509,6 +515,160 @@ class TestHypergraphNode(unittest.TestCase):
         self.assertIn('type', node_dict)
         self.assertIn('content', node_dict)
         self.assertIn('salience', node_dict)
+
+
+# Unified Echo Component Interface Tests
+if _ECHO_INTEGRATION_AVAILABLE:
+    class TestEchoselfIntrospectionComponent(unittest.TestCase):
+        """Test cases for unified Echo component interface"""
+        
+        def setUp(self):
+            self.test_dir = Path(tempfile.mkdtemp())
+            
+            # Create test files
+            (self.test_dir / "README.md").write_text("# Test Project")
+            (self.test_dir / "src").mkdir()
+            (self.test_dir / "src" / "main.py").write_text("def main(): pass")
+            
+            self.config = EchoConfig(
+                component_name="test_introspection",
+                version="1.0.0",
+                debug_mode=True
+            )
+            self.component = EchoselfIntrospectionComponent(self.config, self.test_dir)
+        
+        def tearDown(self):
+            shutil.rmtree(self.test_dir)
+        
+        def test_component_initialization(self):
+            """Test unified component initialization"""
+            result = self.component.initialize()
+            
+            self.assertTrue(result.success)
+            self.assertIn("initialized", result.message)
+            self.assertTrue(self.component._initialized)
+            self.assertIn('repository_root', result.metadata)
+        
+        def test_component_process(self):
+            """Test unified component processing"""
+            # Initialize first
+            self.component.initialize()
+            
+            # Process with dict input
+            input_data = {
+                'current_load': 0.7,
+                'recent_activity': 0.3
+            }
+            result = self.component.process(input_data)
+            
+            self.assertTrue(result.success)
+            self.assertIn('timestamp', result.data)
+            self.assertIn('total_files_processed', result.data)
+            self.assertIn('attention_threshold', result.metadata)
+            
+            # Process with kwargs
+            result2 = self.component.process(None, current_load=0.5, recent_activity=0.6)
+            self.assertTrue(result2.success)
+        
+        def test_component_echo(self):
+            """Test unified component echo operation"""
+            # Initialize first
+            self.component.initialize()
+            
+            test_data = "Test introspection data"
+            echo_value = 0.8
+            
+            result = self.component.echo(test_data, echo_value)
+            
+            self.assertTrue(result.success)
+            self.assertIn('original_data', result.data)
+            self.assertIn('echo_value', result.data)
+            self.assertIn('introspection_prompt', result.data)
+            self.assertEqual(result.data['original_data'], test_data)
+            self.assertEqual(result.data['echo_value'], echo_value)
+            self.assertIn('prompt_length', result.metadata)
+        
+        def test_component_get_status(self):
+            """Test component status retrieval"""
+            result = self.component.get_status()
+            
+            self.assertTrue(result.success)
+            self.assertIn('component_name', result.data)
+            self.assertIn('version', result.data)
+            self.assertEqual(result.data['component_name'], 'test_introspection')
+        
+        def test_component_reset(self):
+            """Test component reset functionality"""
+            # Initialize and add some state
+            self.component.initialize()
+            self.component.state['test_key'] = 'test_value'
+            
+            result = self.component.reset()
+            
+            self.assertTrue(result.success)
+            self.assertFalse(self.component._initialized)
+            self.assertEqual(len(self.component.state), 0)
+        
+        def test_introspection_metrics(self):
+            """Test introspection-specific metrics"""
+            self.component.initialize()
+            
+            # Generate some activity first
+            self.component.process({'current_load': 0.5, 'recent_activity': 0.5})
+            
+            result = self.component.get_introspection_metrics()
+            self.assertTrue(result.success)
+            # Note: metrics might be empty if no attention history exists
+        
+        def test_hypergraph_export(self):
+            """Test hypergraph export functionality"""
+            self.component.initialize()
+            
+            # Generate some data first
+            self.component.process({'current_load': 0.5, 'recent_activity': 0.5})
+            
+            result = self.component.export_hypergraph()
+            
+            self.assertTrue(result.success)
+            self.assertIn('output_path', result.data)
+            
+            # Clean up the exported file
+            output_path = result.data['output_path']
+            if Path(output_path).exists():
+                Path(output_path).unlink()
+        
+        def test_error_handling(self):
+            """Test component error handling"""
+            # Test with invalid repository path
+            invalid_config = EchoConfig(component_name="invalid_test")
+            invalid_component = EchoselfIntrospectionComponent(
+                invalid_config, 
+                Path("/nonexistent/path")
+            )
+            
+            result = invalid_component.initialize()
+            self.assertFalse(result.success)
+            self.assertIn("does not exist", result.message)
+        
+        def test_auto_initialization(self):
+            """Test automatic initialization during operations"""
+            # Component not initialized yet
+            self.assertFalse(self.component._initialized)
+            
+            # Process should auto-initialize
+            result = self.component.process({'current_load': 0.5, 'recent_activity': 0.5})
+            
+            self.assertTrue(result.success)
+            self.assertTrue(self.component._initialized)
+            
+            # Echo should also auto-initialize
+            self.component._initialized = False
+            result = self.component.echo("test data", 0.5)
+            
+            self.assertTrue(result.success)
+            self.assertTrue(self.component._initialized)
+
+
 # main
 
 if __name__ == "__main__":
