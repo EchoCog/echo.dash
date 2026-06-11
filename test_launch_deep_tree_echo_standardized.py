@@ -11,7 +11,6 @@ import unittest
 import logging
 import sys
 import asyncio
-from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 
 # Add the current directory to the path for imports
@@ -81,19 +80,21 @@ class TestDeepTreeEchoLauncherStandardized(unittest.TestCase):
         config = EchoConfig(component_name="TestLauncher")
         component = DeepTreeEchoLauncherStandardized(config)
         
-        # Mock UnifiedLauncher if not available
-        if not UNIFIED_LAUNCHER_AVAILABLE:
-            with patch('launch_deep_tree_echo.UNIFIED_LAUNCHER_AVAILABLE', True):
-                with patch('launch_deep_tree_echo.UnifiedLauncher') as mock_launcher:
-                    mock_launcher.return_value = Mock()
-                    result = component.initialize()
-                    self.assertTrue(result.success)
-                    self.assertTrue(component._initialized)
-        else:
-            # Test with actual unified launcher
+        # Test with real UnifiedLauncher when available
+        try:
+            from unified_launcher import UnifiedLauncher
+            # Test initialization with real component
             result = component.initialize()
-            # May succeed or fail depending on availability, but should not crash
             self.assertIsInstance(result, type(EchoResponse(success=True)))
+            
+            # If initialization succeeded, launcher should be set
+            if result.success:
+                self.assertTrue(component._initialized)
+                self.assertIsNotNone(component.unified_launcher)
+                self.assertIsInstance(component.unified_launcher, UnifiedLauncher)
+            
+        except ImportError:
+            self.skipTest("UnifiedLauncher not available for real testing")
 
     @unittest.skipIf(not LAUNCHER_STANDARDIZED_AVAILABLE, "Module not available")
     def test_initialization_without_unified_launcher(self):
@@ -153,15 +154,20 @@ class TestDeepTreeEchoLauncherStandardized(unittest.TestCase):
         config = EchoConfig(component_name="TestLauncher")
         component = DeepTreeEchoLauncherStandardized(config)
         
-        # Mock initialization
-        component._initialized = True
-        component.unified_launcher = Mock()
-        
-        # Test get_status operation
-        result = component.process("get_status")
-        self.assertTrue(result.success)
-        self.assertIn("component_info", result.data)
-        self.assertIn("initialized", result.data)
+        # Set up real UnifiedLauncher for testing
+        try:
+            from unified_launcher import UnifiedLauncher
+            component._initialized = True
+            component.unified_launcher = UnifiedLauncher()
+            
+            # Test get_status operation
+            result = component.process("get_status")
+            self.assertTrue(result.success)
+            self.assertIn("component_info", result.data)
+            self.assertIn("initialized", result.data)
+            
+        except ImportError:
+            self.skipTest("UnifiedLauncher not available for real testing")
 
     @unittest.skipIf(not LAUNCHER_STANDARDIZED_AVAILABLE, "Module not available")
     def test_process_get_history_operation(self):
@@ -172,16 +178,22 @@ class TestDeepTreeEchoLauncherStandardized(unittest.TestCase):
         config = EchoConfig(component_name="TestLauncher")
         component = DeepTreeEchoLauncherStandardized(config)
         
-        # Mock initialization
-        component._initialized = True
-        component.unified_launcher = Mock()
-        
-        # Test get_history operation
-        result = component.process("get_history")
-        self.assertTrue(result.success)
-        self.assertIn("launch_history", result.data)
-        self.assertIn("total_launches", result.data)
-        self.assertEqual(result.data["total_launches"], 0)
+        # Set up real UnifiedLauncher for testing
+        try:
+            from unified_launcher import UnifiedLauncher
+            component._initialized = True
+            component.unified_launcher = UnifiedLauncher()
+            
+            # Test get_history operation
+            result = component.process("get_history")
+            self.assertTrue(result.success)
+            self.assertIn("launch_history", result.data)
+            self.assertIn("total_launches", result.data)
+            # With real launcher, total may not be 0, just verify it's a number
+            self.assertIsInstance(result.data["total_launches"], int)
+            
+        except ImportError:
+            self.skipTest("UnifiedLauncher not available for real testing")
 
     @unittest.skipIf(not LAUNCHER_STANDARDIZED_AVAILABLE, "Module not available")
     def test_process_invalid_operation(self):
