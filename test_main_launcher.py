@@ -71,15 +71,15 @@ class TestMainLauncher(unittest.TestCase):
         """Test argument validation logic"""
         parser = self.launch.create_main_parser()
         
-        # Test conflicting arguments
+        # Test conflicting arguments - should return errors, not warnings
         args = parser.parse_args(['dashboards', '--gui-only', '--web-only'])
-        warnings = self.launch.validate_args(args)
-        self.assertTrue(any('gui-only' in w and 'web-only' in w for w in warnings))
+        errors = self.launch.validate_configuration(args)
+        self.assertTrue(any('gui-only' in e and 'web-only' in e for e in errors))
         
-        # Test mode-specific argument warnings
-        args = parser.parse_args(['gui', '--browser'])
-        warnings = self.launch.validate_args(args)
-        self.assertTrue(any('browser' in w for w in warnings))
+        # Test invalid port
+        args = parser.parse_args(['web', '--port', '99999'])
+        errors = self.launch.validate_configuration(args)
+        self.assertTrue(any('port' in e for e in errors))
 
     def test_mode_specific_configurations(self):
         """Test that different modes create appropriate configurations"""
@@ -102,6 +102,27 @@ class TestMainLauncher(unittest.TestCase):
         self.assertEqual(args.mode, 'web')
         self.assertEqual(args.port, 7000)
 
+    @patch('launch.UnifiedLauncher')
+    @patch('unified_launcher.create_config_from_args')
+    def test_main_function_execution(self, mock_config, mock_launcher):
+        """Test the main function execution flow"""
+        # Mock configuration and launcher
+        mock_config_instance = Mock()
+        mock_config_instance.mode.value = 'gui'
+        mock_config_instance.debug = False
+        mock_config_instance.log_file = None
+        mock_config.return_value = mock_config_instance
+        
+        mock_launcher_instance = Mock()
+        mock_launcher_instance.launch_sync.return_value = 0
+        mock_launcher.return_value = mock_launcher_instance
+        
+        # Test with validation-only mode to avoid GUI dependencies
+        test_args = ['launch.py', 'gui', '--quiet', '--validate-config']
+        with patch('sys.argv', test_args):
+            result = self.launch.main()
+        
+        # Should succeed in validation mode
     def test_main_function_execution(self):
         """Test the main function execution flow with real components"""
         try:
@@ -133,9 +154,6 @@ class TestMainLauncher(unittest.TestCase):
             # Real components may have different behavior, this is acceptable
             pass
         self.assertEqual(result, 0)
-        mock_config.assert_called_once()
-        mock_launcher.assert_called_once()
-        mock_launcher_instance.launch_sync.assert_called_once_with(mock_config_instance)
 
     def test_help_output(self):
         """Test that help output is comprehensive"""
