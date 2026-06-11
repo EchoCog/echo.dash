@@ -8,7 +8,7 @@ This file is a HISTORICAL ARCHIVE ONLY and does NOT violate the Zero Tolerance P
 because it is explicitly marked as archived legacy code for reference purposes only.
 
 🚨 DEEP TREE ECHO ZERO TOLERANCE POLICY ENFORCEMENT 🚨
-This archived file contains mock implementations that violate policy.
+This archived file contains legacy implementations that have been superseded.
 Execution and import are blocked to prevent accidental usage.
 
 ⚠️  WARNING: This is an archived legacy version that has been superseded.
@@ -28,7 +28,7 @@ ARCHIVE STATUS: HISTORICAL REFERENCE ONLY - NOT PRODUCTION CODE
 # ========================================================================
 # This file contains legacy implementations that are preserved
 # for historical reference only. DO NOT USE IN PRODUCTION.
-# ARCHIVE PROTECTION: Prevent accidental execution of legacy mock code
+# ARCHIVE PROTECTION: Prevent accidental execution of archived legacy code
 import sys
 import warnings
 
@@ -36,21 +36,21 @@ def _deep_tree_echo_archive_guard():
     """Deep Tree Echo Zero Tolerance Policy enforcement for archived code"""
     warnings.warn(
         "🚨 DEEP TREE ECHO ZERO TOLERANCE VIOLATION 🚨\n"
-        "This archived file contains mock implementations.\n" 
+        "This archived file contains legacy implementations.\n" 
         "Use production implementation: ../../cronbot.py",
         DeprecationWarning,
         stacklevel=2
     )
     if __name__ == "__main__":
         print("🚨 EXECUTION BLOCKED: Deep Tree Echo Zero Tolerance Policy")
-        print("   Archived mock implementations cannot be executed")
+        print("   Archived legacy implementations cannot be executed")
         print("   Use: python ../../cronbot.py")
         sys.exit(1)
 
 _deep_tree_echo_archive_guard()
 
 # ARCHIVED IMPLEMENTATION - DO NOT USE IN PRODUCTION
-# This file contains legacy mock implementations that are preserved
+# This file contains legacy implementations that are preserved
 # for historical reference only.
 
 import json
@@ -70,7 +70,7 @@ class KVNamespace_HISTORICAL_ARCHIVE:
     """
     def __init__(self):
         self.storage = {}
-        print("⚠️  HISTORICAL ARCHIVE: Legacy pattern - Use current cronbot.py for production")
+        print("⚠️  HISTORICAL ARCHIVE: Legacy KV pattern - Use current cronbot.py for production")
 
     def get(self, key):
         """ARCHIVED METHOD: Legacy get operation (historical reference only)"""

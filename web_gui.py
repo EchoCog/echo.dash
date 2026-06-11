@@ -765,6 +765,8 @@ HTML_TEMPLATE = '''
                         </select>
                     </div>
                     <div class="filter-control">
+                        <label for="search-filter">Search:</label>
+                        <input type="text" id="search-filter" value="" title="Deep Tree Echo session filter - search across recursive memory patterns" oninput="filterSessions(this.value)">
                         <label for="search-filter">Deep Tree Echo Filter:</label>
                         <input type="text" id="search-filter" value="" 
                                title="Deep Tree Echo session filter - recursive memory pattern search" 
