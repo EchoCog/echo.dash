@@ -1,0 +1,79 @@
+{
+  "test_session_id": "echo_api_test_20250913_183935",
+  "total_duration": 0.0017778873443603516,
+  "tests_run": 5,
+  "tests_passed": 4,
+  "overall_success_rate": 0.9333333333333333,
+  "component_compatibility_score": 0.9285714285714286,
+  "integration_quality_score": 0.8833333333333333,
+  "test_metrics": [
+    {
+      "test_name": "Standardized Interfaces",
+      "duration": 0.00045752525329589844,
+      "components_tested": 3,
+      "components_passed": 3,
+      "components_failed": 0,
+      "success_rate": 1.0,
+      "errors": [],
+      "warnings": [],
+      "timestamp": "2025-09-13T18:39:35.595892"
+    },
+    {
+      "test_name": "Cross-Component Communication",
+      "duration": 0.0003788471221923828,
+      "components_tested": 2,
+      "components_passed": 2,
+      "components_failed": 0,
+      "success_rate": 1.0,
+      "errors": [],
+      "warnings": [
+        "Low format compatibility: 0.33"
+      ],
+      "timestamp": "2025-09-13T18:39:35.596366"
+    },
+    {
+      "test_name": "Configuration Consistency",
+      "duration": 0.0006384849548339844,
+      "components_tested": 3,
+      "components_passed": 3,
+      "components_failed": 0,
+      "success_rate": 1.0,
+      "errors": [],
+      "warnings": [],
+      "timestamp": "2025-09-13T18:39:35.596778"
+    },
+    {
+      "test_name": "Error Handling Standardization",
+      "duration": 0.000274658203125,
+      "components_tested": 3,
+      "components_passed": 3,
+      "components_failed": 0,
+      "success_rate": 1.0,
+      "errors": [],
+      "warnings": [],
+      "timestamp": "2025-09-13T18:39:35.597443"
+    },
+    {
+      "test_name": "Backward Compatibility",
+      "duration": 2.8371810913085938e-05,
+      "components_tested": 3,
+      "components_passed": 2,
+      "components_failed": 0,
+      "success_rate": 0.6666666666666666,
+      "errors": [],
+      "warnings": [],
+      "timestamp": "2025-09-13T18:39:35.597755"
+    }
+  ],
+  "recommendations": [
+    "Address current issues before proceeding with medium complexity migrations"
+  ],
+  "next_migration_targets": [
+    "deep_tree_echo_analyzer.py",
+    "trigger_echopilot.py",
+    "echo_evolution.py",
+    "echo9ml_demo.py",
+    "echo9ml_integration.py"
+  ],
+  "timestamp": "2025-09-13T18:39:35.597818"
+}

@@ -191,6 +191,19 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
             
             # Create config from arguments or use provided config
             if args_dict:
+                # Create real args object using argparse with proper defaults
+                parser = create_argument_parser(config_name)
+                
+                # Convert dict to command line arguments
+                cmd_args = []
+                for key, value in args_dict.items():
+                    if isinstance(value, bool) and value:
+                        cmd_args.append(f"--{key.replace('_', '-')}")
+                    elif not isinstance(value, bool):
+                        cmd_args.extend([f"--{key.replace('_', '-')}", str(value)])
+                
+                # Parse the constructed arguments
+                args = parser.parse_args(cmd_args)
                 # Create real arguments object from dictionary using argparse Namespace
                 import argparse
                 args = argparse.Namespace(**args_dict)
@@ -244,6 +257,19 @@ class DeepTreeEchoLauncherStandardized(EchoComponent):
         """Create configuration from arguments"""
         try:
             if args_dict:
+                # Create real args object using argparse with proper defaults
+                parser = create_argument_parser(config_name)
+                
+                # Convert dict to command line arguments
+                cmd_args = []
+                for key, value in args_dict.items():
+                    if isinstance(value, bool) and value:
+                        cmd_args.append(f"--{key.replace('_', '-')}")
+                    elif not isinstance(value, bool):
+                        cmd_args.extend([f"--{key.replace('_', '-')}", str(value)])
+                
+                # Parse the constructed arguments
+                args = parser.parse_args(cmd_args)
                 # Create real arguments object from dictionary using argparse Namespace
                 import argparse
                 args = argparse.Namespace(**args_dict)
