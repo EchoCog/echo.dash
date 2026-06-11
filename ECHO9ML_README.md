@@ -45,7 +45,19 @@ Shape: (3, 7, 13, 5, 2)
 
 ## Usage
 
-### Basic Usage
+### Quick Start
+
+```python
+from echo9ml import create_echo9ml_system, create_deep_tree_echo
+
+# Create a complete Echo9ml system
+system = create_echo9ml_system()
+
+# Or create just the persona kernel
+persona = create_deep_tree_echo()
+```
+
+### Basic System Usage
 
 ```python
 from echo9ml import create_echo9ml_system
@@ -64,6 +76,20 @@ experience = {
 
 result = system.process_experience(experience)
 print(f"Confidence: {result['persona_state']['confidence']:.3f}")
+```
+
+### Direct Persona Creation
+
+```python
+from echo9ml import create_deep_tree_echo, PersonaTraitType
+
+# Create Deep Tree Echo persona kernel
+persona = create_deep_tree_echo()
+
+# Inspect persona traits
+print(f"Persona: {persona.name}")
+for trait, value in persona.traits.items():
+    print(f"  {trait.value}: {value:.2f}")
 ```
 
 ### Integration with Cognitive Architecture
@@ -127,11 +153,24 @@ for trait, value in snapshot['persona_kernel']['traits'].items():
 
 ## API Reference
 
+### Factory Functions
+
+```python
+# Create complete Echo9ml system
+system = create_echo9ml_system(save_path="/path/to/save")
+
+# Create Deep Tree Echo persona kernel
+persona = create_deep_tree_echo()
+```
+
 ### PersonaKernel
 
 ```python
-# Create Deep Tree Echo persona
+# Create Deep Tree Echo persona (class method)
 persona = PersonaKernel.create_deep_tree_echo()
+
+# Or use module-level function (recommended)
+persona = create_deep_tree_echo()
 
 # Access traits
 creativity = persona.traits[PersonaTraitType.CANOPY]
