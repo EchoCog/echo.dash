@@ -19,7 +19,12 @@ Standardized API Integration:
 - Provides unified configuration and response handling
 """
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    # Use mock numpy for testing when numpy is not available
+    import mock_numpy as np
+
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Any, Set
 from enum import Enum
