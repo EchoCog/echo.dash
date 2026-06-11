@@ -1,0 +1,518 @@
+{
+  "cycles": [
+    {
+      "timestamp": "2025-09-13T17:29:11.539496",
+      "duration": 0.9534420967102051,
+      "agents": {
+        "AsyncAgent": 0.812886814706498
+      },
+      "resource_metrics": {
+        "cpu_usage": 0.0,
+        "memory_usage": 0.0,
+        "disk_usage": 0.0
+      }
+    }
+  ],
+  "agents": {
+    "TestAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.577508",
+          "domain": "Testing Domain",
+          "state": 0.8,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.577503",
+      "domain": "Testing Domain",
+      "state": 0.8,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "LegacyAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.579237",
+          "domain": "Legacy Testing",
+          "state": 0.0,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.579232",
+      "domain": "Legacy Testing",
+      "state": 0.0,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "UnifiedAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.580838",
+          "domain": "Unified Testing",
+          "state": 0.0,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.580831",
+      "domain": "Unified Testing",
+      "state": 0.0,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "CognitiveAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.582417",
+          "domain": "Cognitive Architecture",
+          "state": 0.2256754987872911,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:09.677359",
+          "domain": "Cognitive Architecture",
+          "state": 0.7,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.309435",
+          "domain": "Cognitive Architecture",
+          "state": 0.7,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.582412",
+      "domain": "Cognitive Architecture",
+      "state": 0.7,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "MemoryAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.582756",
+          "domain": "Memory Management",
+          "state": 0.44317020539127006,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:09.680575",
+          "domain": "Memory Management Systems",
+          "state": 0.6,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.313506",
+          "domain": "Memory Management Systems",
+          "state": 0.6,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.582752",
+      "domain": "Memory Management Systems",
+      "state": 0.6,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "SensoryAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.583114",
+          "domain": "Sensory Processing",
+          "state": 0.6094510429157067,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.583109",
+      "domain": "Sensory Processing",
+      "state": 0.6094510429157067,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "IntegrationAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:29:10.583453",
+          "domain": "System Integration",
+          "state": 0.7623844210215742,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:29:10.583449",
+      "domain": "System Integration",
+      "state": 0.7623844210215742,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "AttentionAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:30:09.681100",
+          "domain": "Attention and Focus Mechanisms",
+          "state": 0.6,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.314285",
+          "domain": "Attention and Focus Mechanisms",
+          "state": 0.6,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:30:09.681094",
+      "domain": "Attention and Focus Mechanisms",
+      "state": 0.6,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "ReasoningAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:30:09.681622",
+          "domain": "Logical Reasoning and Inference",
+          "state": 0.6,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.315003",
+          "domain": "Logical Reasoning and Inference",
+          "state": 0.6,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:30:09.681616",
+      "domain": "Logical Reasoning and Inference",
+      "state": 0.6,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "PerceptionAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:30:09.684910",
+          "domain": "Visual and Auditory Processing",
+          "state": 0.6413980857490319,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.318840",
+          "domain": "Visual and Auditory Processing",
+          "state": 0.13567242333015905,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:30:09.684905",
+      "domain": "Visual and Auditory Processing",
+      "state": 0.13567242333015905,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "LanguageAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:30:09.685471",
+          "domain": "Natural Language Understanding",
+          "state": 0.745220569509102,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.319663",
+          "domain": "Natural Language Understanding",
+          "state": 0.4821488617933658,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:30:09.685465",
+      "domain": "Natural Language Understanding",
+      "state": 0.4821488617933658,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "PlanningAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:30:09.686044",
+          "domain": "Goal Planning and Execution",
+          "state": 0.917007518443132,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.320440",
+          "domain": "Goal Planning and Execution",
+          "state": 0.05660040466694005,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:30:09.686039",
+      "domain": "Goal Planning and Execution",
+      "state": 0.05660040466694005,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "EmotionAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:30:09.686644",
+          "domain": "Emotional Processing and Regulation",
+          "state": 0.2034449382717155,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.321280",
+          "domain": "Emotional Processing and Regulation",
+          "state": 0.06435328391737516,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:30:09.686639",
+      "domain": "Emotional Processing and Regulation",
+      "state": 0.06435328391737516,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "LearningAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:30:09.690021",
+          "domain": "Machine Learning and Adaptation",
+          "state": 0.4,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.325700",
+          "domain": "Machine Learning and Adaptation",
+          "state": 0.4,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        }
+      ],
+      "created_at": "2025-09-13T17:30:09.690015",
+      "domain": "Machine Learning and Adaptation",
+      "state": 0.4,
+      "poll_interval": 1.0,
+      "error_threshold": 0.1
+    },
+    "OptimizationAgent": {
+      "history": [
+        {
+          "timestamp": "2025-09-13T17:30:09.690758",
+          "domain": "Performance Optimization",
+          "state": 0.4,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:09.692833",
+          "state": 1.2053996047280369,
+          "iteration": 1,
+          "factors": {
+            "improvement": 0.4653996047280369,
+            "constraint": 0.4,
+            "resource": 0.2,
+            "correction": 0.1
+          },
+          "error_rate": 0.0
+        },
+        {
+          "timestamp": "2025-09-13T17:30:09.693380",
+          "poll_interval": 0.95
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.326525",
+          "domain": "Performance Optimization",
+          "state": 0.4,
+          "poll_interval": 1.0,
+          "error_threshold": 0.1
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.329712",
+          "state": 1.0588474533559615,
+          "iteration": 1,
+          "factors": {
+            "improvement": 0.31884745335596154,
+            "constraint": 0.4,
+            "resource": 0.2,
+            "correction": 0.1
+          },
+          "error_rate": 0.0
+        },
+        {
+          "timestamp": "2025-09-13T17:30:29.330342",
+          "poll_interval": 0.95
+        }
+      ],
+      "created_at": "2025-09-13T17:30:09.690753",
+      "domain": "Performance Optimization",
+      "state": 1.0588474533559615,
+      "poll_interval": 0.95,
+      "error_threshold": 0.1,
+      "iteration": 1,
+      "factors": {
+        "improvement": 0.31884745335596154,
+        "constraint": 0.4,
+        "resource": 0.2,
+        "correction": 0.1
+      },
+      "error_rate": 0.0
+    }
+  },
+  "system_metrics": [
+    {
+      "agent_echo": "TestAgent",
+      "resonance": 0.66,
+      "echo_value": 0.9,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:29:10.577678"
+    },
+    {
+      "agent_echo": "TestAgent",
+      "resonance": 0.16000000000000003,
+      "echo_value": 0.9,
+      "data_type": "dict",
+      "timestamp": "2025-09-13T17:29:10.578138"
+    },
+    {
+      "agent_echo": "TestAgent",
+      "resonance": 0.16000000000000003,
+      "echo_value": 0.9,
+      "data_type": "list",
+      "timestamp": "2025-09-13T17:29:10.578394"
+    },
+    {
+      "agent_echo": "TestAgent",
+      "resonance": 0.16000000000000003,
+      "echo_value": 0.9,
+      "data_type": "int",
+      "timestamp": "2025-09-13T17:29:10.578667"
+    },
+    {
+      "agent_echo": "LegacyAgent",
+      "resonance": 0.0,
+      "echo_value": 0.5,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:29:10.579479"
+    },
+    {
+      "agent_echo": "UnifiedAgent",
+      "resonance": 0.5,
+      "echo_value": 0.7,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:29:10.581185"
+    },
+    {
+      "agent_echo": "IntegrationAgent",
+      "resonance": 0.15247688420431485,
+      "echo_value": 0.6,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:29:10.584825"
+    },
+    {
+      "agent_echo": "CognitiveAgent",
+      "resonance": 1.0,
+      "echo_value": 0.8,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:30:09.677756"
+    },
+    {
+      "agent_echo": "CognitiveAgent",
+      "resonance": 0.64,
+      "echo_value": 0.8,
+      "data_type": "dict",
+      "timestamp": "2025-09-13T17:30:09.678325"
+    },
+    {
+      "agent_echo": "CognitiveAgent",
+      "resonance": 0.13999999999999999,
+      "echo_value": 0.8,
+      "data_type": "list",
+      "timestamp": "2025-09-13T17:30:09.678780"
+    },
+    {
+      "agent_echo": "ReasoningAgent",
+      "resonance": 0.12,
+      "echo_value": 0.85,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:30:09.683077"
+    },
+    {
+      "agent_echo": "EmotionAgent",
+      "resonance": 0.0406889876543431,
+      "echo_value": 0.9,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:30:09.688593"
+    },
+    {
+      "agent_echo": "OptimizationAgent",
+      "resonance": 1.0,
+      "echo_value": 0.0,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:30:10.646533"
+    },
+    {
+      "agent_echo": "CognitiveAgent",
+      "resonance": 1.0,
+      "echo_value": 0.8,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:30:29.310033"
+    },
+    {
+      "agent_echo": "CognitiveAgent",
+      "resonance": 0.64,
+      "echo_value": 0.8,
+      "data_type": "dict",
+      "timestamp": "2025-09-13T17:30:29.310818"
+    },
+    {
+      "agent_echo": "CognitiveAgent",
+      "resonance": 0.13999999999999999,
+      "echo_value": 0.8,
+      "data_type": "list",
+      "timestamp": "2025-09-13T17:30:29.311529"
+    },
+    {
+      "agent_echo": "ReasoningAgent",
+      "resonance": 0.12,
+      "echo_value": 0.85,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:30:29.317063"
+    },
+    {
+      "agent_echo": "EmotionAgent",
+      "resonance": 0.012870656783475033,
+      "echo_value": 0.9,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:30:29.324279"
+    },
+    {
+      "agent_echo": "OptimizationAgent",
+      "resonance": 1.0,
+      "echo_value": 0.0,
+      "data_type": "str",
+      "timestamp": "2025-09-13T17:30:30.284010"
+    }
+  ],
+  "last_updated": "2025-09-13T17:30:30.284013"
+}
