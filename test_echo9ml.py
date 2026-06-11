@@ -6,7 +6,11 @@ according to the specifications in echo9ml.md
 """
 
 import unittest
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    # Use mock numpy for testing when numpy is not available
+    import mock_numpy as np
 import tempfile
 import json
 from pathlib import Path
@@ -17,7 +21,7 @@ from typing import Dict, Any
 from echo9ml import (
     PersonaKernel, TensorPersonaEncoding, HypergraphPersonaEncoder,
     AttentionAllocationLayer, EvolutionEngine, MetaCognitiveEnhancer,
-    Echo9mlSystem, PersonaTraitType, create_echo9ml_system
+    Echo9mlSystem, PersonaTraitType, create_echo9ml_system, create_deep_tree_echo
 )
 
 class TestPersonaKernel(unittest.TestCase):
@@ -50,6 +54,21 @@ class TestPersonaKernel(unittest.TestCase):
         self.assertIsInstance(self.persona.evolution, dict)
         self.assertIn("adaptation_rate", self.persona.evolution)
         self.assertGreater(self.persona.creation_time, 0)
+    
+    def test_module_level_create_function(self):
+        """Test module-level create_deep_tree_echo function"""
+        # Test that module-level function works
+        module_persona = create_deep_tree_echo()
+        
+        # Should be same type and structure as class method
+        self.assertIsInstance(module_persona, PersonaKernel)
+        self.assertEqual(module_persona.name, "Deep Tree Echo")
+        self.assertEqual(len(module_persona.traits), 7)
+        
+        # Should have same trait values as class method
+        class_persona = PersonaKernel.create_deep_tree_echo()
+        self.assertEqual(module_persona.traits, class_persona.traits)
+        self.assertEqual(module_persona.trait_connections, class_persona.trait_connections)
 
 class TestTensorPersonaEncoding(unittest.TestCase):
     """Test tensor encoding functionality"""

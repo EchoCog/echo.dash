@@ -29,6 +29,15 @@ from queue import Queue
 from typing import Dict, List, Any, Optional, Union, Tuple
 import yaml
 
+# Import unified architecture components
+try:
+    from echo_component_base import ProcessingEchoComponent, EchoConfig, EchoResponse
+except ImportError:
+    # Fallback if component base is not available
+    ProcessingEchoComponent = object
+    EchoConfig = type('EchoConfig', (), {})
+    EchoResponse = type('EchoResponse', (), {})
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -308,6 +317,84 @@ class EchoAgent:
             "poll_interval": self.poll_interval
         })
     
+    def echo(self, data: Any, echo_value: float = None) -> Dict[str, Any]:
+        """
+        Echo function for Deep Tree Echo integration.
+        
+        This method provides the agent's perspective on input data,
+        incorporating the agent's current state, domain expertise,
+        and evolutionary history.
+        
+        Args:
+            data: Input data to process with echo
+            echo_value: Optional echo value to apply (uses agent state if None)
+            
+        Returns:
+            Dict containing echoed data with agent metadata
+        """
+        if echo_value is None:
+            echo_value = self.state
+        
+        # Calculate resonance based on data relevance to agent's domain
+        resonance = self._calculate_resonance(data)
+        
+        # Apply echo transformation
+        echoed_data = {
+            'original_data': data,
+            'agent_name': self.name,
+            'agent_domain': self.domain,
+            'echo_value': echo_value,
+            'resonance': resonance,
+            'agent_state': self.state,
+            'iteration': self.iteration,
+            'error_rate': self.error_count / (self.job_count + 1),
+            'poll_interval': self.poll_interval,
+            'timestamp': datetime.utcnow().isoformat(),
+            'echo_metadata': {
+                'processing_quality': min(1.0, max(0.0, self.state)),
+                'agent_maturity': self.iteration / 100.0,  # Normalize iteration count
+                'domain_expertise': resonance * echo_value
+            }
+        }
+        
+        # Record echo operation in memory
+        self.memory.record_system_metrics({
+            'agent_echo': self.name,
+            'resonance': resonance,
+            'echo_value': echo_value,
+            'data_type': str(type(data).__name__)
+        })
+        
+        return echoed_data
+    
+    def _calculate_resonance(self, data: Any) -> float:
+        """
+        Calculate how well the data resonates with this agent's domain.
+        
+        This is a simplified implementation that could be enhanced based
+        on specific domain requirements.
+        """
+        if not data:
+            return 0.0
+        
+        data_str = str(data).lower()
+        domain_str = self.domain.lower()
+        
+        # Simple keyword matching for resonance calculation
+        domain_keywords = domain_str.split()
+        matches = sum(1 for keyword in domain_keywords if keyword in data_str)
+        
+        # Calculate resonance as percentage of domain keywords found
+        if domain_keywords:
+            base_resonance = matches / len(domain_keywords)
+        else:
+            base_resonance = 0.5  # Default moderate resonance
+        
+        # Modify resonance based on agent state (better agents resonate better)
+        state_bonus = self.state * 0.2  # Up to 20% bonus for high-state agents
+        
+        return min(1.0, base_resonance + state_bonus)
+    
     async def process_job(self) -> bool:
         """Simulate processing a job with potential failures based on state quality"""
         try:
@@ -331,18 +418,168 @@ class EchoAgent:
             logger.error(f"[{self.name}] Error processing job: {str(e)}")
             return False
 
-class EvolutionNetwork:
+class EvolutionNetwork(ProcessingEchoComponent):
     """
     Manages a network of evolving agents that mutually influence each other,
     forming a self-improving ecosystem.
+    
+    Integrates with the unified Deep Tree Echo architecture while maintaining
+    backward compatibility with existing evolution functionality.
     """
     
-    def __init__(self):
+    def __init__(self, config: EchoConfig = None):
+        # Initialize unified interface if config is provided
+        if config is not None:
+            super().__init__(config)
+        else:
+            # Backward compatibility - create default config
+            self.config = None
+            self.logger = logging.getLogger("echo_evolution")
+        
         self.agents = {}
         self.emitter = {}
         self.resource_monitor = ResourceMonitor()
         self.memory = EvolutionMemory()
-        logger.info("Evolution Network initialized")
+        self.logger.info("Evolution Network initialized")
+    
+    def initialize(self) -> Any:
+        """Initialize the evolution network (unified interface)"""
+        try:
+            if hasattr(super(), 'initialize'):
+                result = super().initialize()
+                if hasattr(result, 'success') and not result.success:
+                    return result
+            
+            # Start resource monitoring
+            self.resource_monitor.start()
+            
+            # Initialize processing pipeline for evolution data
+            if hasattr(self, 'add_processing_step'):
+                self.add_processing_step(self._preprocess_evolution_data, "evolution_preprocessor")
+                self.add_processing_step(self._analyze_agent_states, "agent_analyzer")
+                self.add_processing_step(self._generate_evolution_summary, "summary_generator")
+            
+            message = "Evolution Network initialized successfully"
+            self.logger.info(message)
+            
+            # Return EchoResponse if available, otherwise return simple dict
+            if hasattr(self, 'config') and self.config is not None:
+                return EchoResponse(success=True, message=message)
+            else:
+                return {"success": True, "message": message}
+                
+        except Exception as e:
+            error_msg = f"Failed to initialize Evolution Network: {str(e)}"
+            self.logger.error(error_msg)
+            if hasattr(self, 'handle_error'):
+                return self.handle_error(e, "initialize")
+            else:
+                return {"success": False, "message": error_msg}
+    
+    def process(self, input_data: Any, **kwargs) -> Any:
+        """Process evolution data (unified interface)"""
+        try:
+            if hasattr(self, 'validate_input'):
+                validation = self.validate_input(input_data)
+                if hasattr(validation, 'success') and not validation.success:
+                    return validation
+            
+            # Process through parent pipeline if available
+            if hasattr(super(), 'process'):
+                return super().process(input_data, **kwargs)
+            
+            # Default processing for evolution data
+            processed_data = {
+                'input_data': input_data,
+                'network_state': self.get_summary(),
+                'processing_timestamp': datetime.utcnow().isoformat(),
+                'agent_count': len(self.agents)
+            }
+            
+            # Return EchoResponse if available
+            if hasattr(self, 'config') and self.config is not None:
+                return EchoResponse(
+                    success=True,
+                    data=processed_data,
+                    message="Evolution data processed successfully"
+                )
+            else:
+                return {"success": True, "data": processed_data}
+                
+        except Exception as e:
+            if hasattr(self, 'handle_error'):
+                return self.handle_error(e, "process")
+            else:
+                return {"success": False, "message": str(e)}
+    
+    def echo(self, data: Any, echo_value: float = 0.0) -> Any:
+        """Perform echo operation across the evolution network (unified interface)"""
+        try:
+            # Collect echoes from all agents
+            agent_echoes = []
+            for agent_name, agent in self.agents.items():
+                try:
+                    agent_echo = agent.echo(data, echo_value)
+                    agent_echoes.append(agent_echo)
+                except Exception as e:
+                    self.logger.warning(f"Agent {agent_name} echo failed: {str(e)}")
+            
+            # Calculate network-level echo metrics
+            network_echo = {
+                'network_echo_value': echo_value,
+                'agent_echoes': agent_echoes,
+                'network_resonance': self._calculate_network_resonance(agent_echoes),
+                'evolution_state': self.get_summary(),
+                'timestamp': datetime.utcnow().isoformat()
+            }
+            
+            # Return EchoResponse if available
+            if hasattr(self, 'config') and self.config is not None:
+                return EchoResponse(
+                    success=True,
+                    data=network_echo,
+                    message=f"Network echo completed with {len(agent_echoes)} agent responses",
+                    metadata={'agent_count': len(agent_echoes), 'echo_value': echo_value}
+                )
+            else:
+                return {"success": True, "data": network_echo}
+                
+        except Exception as e:
+            if hasattr(self, 'handle_error'):
+                return self.handle_error(e, "echo")
+            else:
+                return {"success": False, "message": str(e)}
+    
+    def _calculate_network_resonance(self, agent_echoes: List[Dict]) -> float:
+        """Calculate overall network resonance from agent echoes"""
+        if not agent_echoes:
+            return 0.0
+        
+        total_resonance = sum(echo.get('resonance', 0.0) for echo in agent_echoes)
+        return total_resonance / len(agent_echoes)
+    
+    def _preprocess_evolution_data(self, data: Any) -> Any:
+        """Preprocessing step for evolution pipeline"""
+        if isinstance(data, dict):
+            data['preprocessed'] = True
+            data['preprocessing_timestamp'] = datetime.utcnow().isoformat()
+        return data
+    
+    def _analyze_agent_states(self, data: Any) -> Any:
+        """Analysis step for agent states"""
+        if isinstance(data, dict):
+            data['agent_analysis'] = {
+                'total_agents': len(self.agents),
+                'average_state': sum(self.emitter.values()) / len(self.emitter) if self.emitter else 0,
+                'state_distribution': list(self.emitter.values())
+            }
+        return data
+    
+    def _generate_evolution_summary(self, data: Any) -> Any:
+        """Generate summary step for evolution pipeline"""
+        if isinstance(data, dict):
+            data['evolution_summary'] = self.get_summary()
+        return data
     
     def add_agent(self, agent: EchoAgent) -> None:
         """Add an agent to the evolution network"""
@@ -512,6 +749,57 @@ class EvolutionNetwork:
             },
             "average_state": sum(agent.state for agent in self.agents.values()) / len(self.agents) if self.agents else 0
         }
+
+def create_echo_evolution_system(config: EchoConfig = None, agent_domains: List[Tuple[str, str]] = None) -> EvolutionNetwork:
+    """
+    Factory function to create an Echo Evolution system with unified interface support.
+    
+    Args:
+        config: Optional EchoConfig for unified interface integration
+        agent_domains: List of (agent_name, domain) tuples for agent creation
+        
+    Returns:
+        Configured EvolutionNetwork instance
+    """
+    if config is None:
+        # Create default config for unified interface
+        config = EchoConfig(
+            component_name="echo_evolution",
+            version="1.0.0",
+            echo_threshold=0.75,
+            max_depth=10,
+            custom_params={
+                "poll_interval": DEFAULT_POLL_INTERVAL,
+                "error_threshold": DEFAULT_ERROR_THRESHOLD,
+                "evolution_cycles": DEFAULT_EVOLUTION_CYCLES
+            }
+        )
+    
+    # Create evolution network with unified interface
+    network = EvolutionNetwork(config)
+    
+    # Initialize the network
+    init_result = network.initialize()
+    if hasattr(init_result, 'success') and not init_result.success:
+        logger.error(f"Failed to initialize evolution network: {init_result.message}")
+        return network
+    
+    # Add default agents if none specified
+    if agent_domains is None:
+        agent_domains = [
+            ("CognitiveAgent", "Cognitive Architecture"),
+            ("MemoryAgent", "Memory Management"),
+            ("SensoryAgent", "Sensory Processing"),
+            ("IntegrationAgent", "System Integration")
+        ]
+    
+    # Create and add agents
+    for name, domain in agent_domains:
+        agent = EchoAgent(name, domain, initial_state=random.uniform(0, 1))
+        network.add_agent(agent)
+    
+    logger.info(f"Created echo evolution system with {len(agent_domains)} agents")
+    return network
 
 async def main():
     """Main function demonstrating the Echo Evolution System"""
